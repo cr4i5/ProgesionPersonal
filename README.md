@@ -1,1 +1,42 @@
-# ProgesionPersonal
+# Mi Progresión · Tropa Scout
+
+Web para que los jóvenes registren su progresión personal (el Excel "TROPA – Progresión personal") y los adultos de programa la revisen.
+Hecha con React + Vite, base de datos y usuarios en **Supabase** (gratis), publicada en **Vercel**.
+
+## Qué incluye
+- **Jóvenes:** crean cuenta, marcan indicadores de las 6 áreas (etapas 3 y 4), Aventurero, especialidades (bronce/plata/oro + punta de flecha), vida de grupo (campamentos y excursiones), créditos y cuaderno de notas. Ven su camino hacia Explorador (90), Pionero (140) y Scout de Bolívar (177).
+- **Adultos:** panel con todos los jóvenes, filtros, pendientes de revisión, **aprobar o pedir ajustes con comentario** por cada logro, "Aprobar todo", y descarga de resumen en CSV (abre en Excel).
+- Seguridad en la base de datos: un joven solo ve lo suyo; solo un adulto puede aprobar; nadie puede hacerse adulto sin el código secreto.
+
+## Puesta en marcha (≈15 min)
+
+### 1. Supabase
+1. Crea un proyecto en https://supabase.com.
+2. **SQL Editor** → pega todo `supabase/schema.sql` → *Run*.
+3. En el mismo SQL Editor, cambia el código de adultos:
+   `update app_settings set value = 'TU-CODIGO-SECRETO' where key = 'adult_code';`
+4. **Authentication → Providers → Email:** desactiva *Confirm email* (así los jóvenes entran de inmediato). Si lo dejas activo, deben confirmar su correo.
+5. **Authentication → URL Configuration:** pon como *Site URL* la dirección de tu web en Vercel (sirve para recuperar contraseña).
+6. **Project Settings → API:** copia *Project URL* y la clave *anon public*.
+
+### 2. Vercel
+1. Sube esta carpeta a un repositorio de GitHub e impórtalo en https://vercel.com/new (Framework: Vite, se detecta solo).
+2. En *Environment Variables* agrega `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`.
+3. *Deploy*.
+
+### 3. Primer uso
+- Los adultos entran a **Crear cuenta → "Soy adulto del programa"** e ingresan el código secreto.
+- Los jóvenes crean su cuenta normal con el enlace de la web.
+
+## Probar sin configurar nada (modo demo)
+```bash
+npm install
+npm run demo      # entra con ana@demo.com (joven) o adulto@demo.com (adulto)
+```
+Los datos del demo viven solo en tu navegador.
+
+## Notas
+- Si un joven olvida su contraseña, usa "Olvidé mi contraseña" (le llega un correo). Hermanos con el mismo correo pueden usar `padre+nombre@gmail.com`.
+- Son datos de menores: usa la web solo con autorización de los representantes y no compartas el código de adulto.
+- Los textos de indicadores salen del Excel (se corrigieron dos erratas: "de oro" → "de otros", "al aporte" → "el aporte"). Para editarlos: `src/lib/raw.js`.
+- Metas y umbrales (Explorador >80 de 90, Pionero >110 de 140, Bolívar >135 de 177, mínimo 16 créditos) están en `src/lib/data.js`.
