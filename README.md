@@ -40,3 +40,9 @@ Los datos del demo viven solo en tu navegador.
 - Son datos de menores: usa la web solo con autorización de los representantes y no compartas el código de adulto.
 - Los textos de indicadores salen del Excel (se corrigieron dos erratas: "de oro" → "de otros", "al aporte" → "el aporte"). Para editarlos: `src/lib/raw.js`.
 - Metas y umbrales (Explorador >80 de 90, Pionero >110 de 140, Bolívar >135 de 177, mínimo 16 créditos) están en `src/lib/data.js`.
+
+## Actualización: registro en la ASV y ficha médica (solo estado)
+Si ya instalaste la versión anterior, corre **una vez** `supabase/migracion_2_registro_asv.sql` en el SQL Editor (Run). Antes de eso la web funciona igual, solo oculta esa tarjeta.
+- Los adultos marcan por joven: *inscrito en la ASV (IMPEESA)* + año, y *ficha médica entregada* + fecha. El joven solo lo ve.
+- **No se guarda ningún dato médico** en esta web. El contenido de la ficha se queda en el papel o en IMPEESA.
+- Esta web **no se conecta con IMPEESA** (no hay API pública ni autorización). Si la ASV la habilita, se puede integrar después.

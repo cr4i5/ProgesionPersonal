@@ -6,6 +6,7 @@ import { AREAS, AREA, kInd } from '../lib/data.js'
 import Patch from '../components/Patch.jsx'
 import Bar from '../components/Bar.jsx'
 import Item from '../components/Item.jsx'
+import Fleur from '../components/Fleur.jsx'
 
 export function AreasIndex() {
   const { stats, base } = useProgress()
@@ -34,6 +35,7 @@ export function AreasIndex() {
 export function PageHead({ title, sub, color, icon }) {
   return (
     <header className="page-head">
+      <i className="stripe" aria-hidden="true" />
       <h1>{title}</h1>
       {sub && <p className="lead">{sub}</p>}
     </header>
@@ -70,7 +72,7 @@ export function AreaPage() {
       <ul className="items">
         {a.stages[stage].map(it => <Item key={it.k} k={kInd(a.id, stage, it.k)} tag={it.k.toUpperCase()} text={it.t} color={a.c} />)}
       </ul>
-      {st.done === st.total && <p className="done-banner">¡Completaste la etapa {stage} de {a.name}!</p>}
+      {st.done === st.total && <p className="done-banner"><Fleur size={22} color="var(--ok)" /> ¡Completaste la etapa {stage} de {a.name}!</p>}
     </div>
   )
 }

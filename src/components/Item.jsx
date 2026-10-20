@@ -64,7 +64,7 @@ function NoteField({ value, onSave, label, placeholder, disabled }) {
 const TRI = [['pendiente', 'Sin empezar'], ['en_proceso', 'En proceso'], ['completado', 'Finalizado']]
 
 /** variant: 'check' (indicador / meta) | 'tri' (sin empezar · en proceso · finalizado) */
-export default function Item({ k, tag, text, color = '#0E7C86', variant = 'check', noteLabel = '¿Cómo lo lograste? (opcional)', notePlaceholder = 'Cuéntalo con tus palabras…', title }) {
+export default function Item({ k, tag, text, color = '#1F3F9A', variant = 'check', noteLabel = '¿Cómo lo lograste? (opcional)', notePlaceholder = 'Cuéntalo con tus palabras…', title }) {
   const { items, save, review, adult, celebrate, toast } = useProgress()
   const row = items[k]
   const status = row?.status || 'pendiente'

@@ -12,14 +12,15 @@ export function ProgressProvider({ userId, mode, base, children }) {
   const [items, setItems] = useState({})
   const [credits, setCredits] = useState([])
   const [person, setPerson] = useState(null)
+  const [admin, setAdmin] = useState(null) // null = función no disponible
   const [state, setState] = useState('loading')
 
   useEffect(() => {
     let live = true
     setState('loading')
-    Promise.all([db.listItems(userId), db.listCredits(userId), db.getProfile(userId)])
-      .then(([i, c, p]) => { if (!live) return; setItems(i); setCredits(c); setPerson(p); setState('ready') })
-      .catch(() => live && setState('error'))
+    Promise.all([db.listItems(userId), db.listCredits(userId), db.getProfile(userId), db.getAdmin(userId)])
+      .then(([i, c, p, a]) => { if (!live) return; setItems(i); setCredits(c); setPerson(p); setAdmin(a); setState('ready') })
+      .catch(e => { console.error('Error cargando datos:', e); if (live) setState('error') })
     return () => { live = false }
   }, [userId])
 
@@ -54,8 +55,13 @@ export function ProgressProvider({ userId, mode, base, children }) {
     catch { setCredits(prev); fail() }
   }, [credits, fail, toast])
 
+  const saveAdmin = useCallback(async patch => {
+    const prev = admin; setAdmin(a => ({ ...a, ...patch }))
+    try { await db.saveAdmin(userId, patch); toast('Guardado') } catch { setAdmin(prev); fail() }
+  }, [admin, userId, fail, toast])
+
   const stats = useMemo(() => summarize(items, credits), [items, credits])
-  const value = { userId, mode, base, adult: mode === 'adult', items, credits, person, stats, save, review, addCredit, deleteCredit, reviewCredit, celebrate, toast, state }
+  const value = { userId, mode, base, adult: mode === 'adult', items, credits, person, stats, admin, saveAdmin, save, review, addCredit, deleteCredit, reviewCredit, celebrate, toast, state }
   if (state === 'loading') return <div className="center-screen"><div className="spinner" aria-label="Cargando" /></div>
   if (state === 'error') return <div className="center-screen"><p className="muted">No pudimos cargar los datos. Recarga la página.</p></div>
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

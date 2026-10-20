@@ -13,7 +13,7 @@ function scallop(r, bumps = 14, amp = 0.045) {
 }
 const SHAPE = scallop(37)
 
-export default function Patch({ icon = 'Star', color = '#0E7C86', soft = '#E2F1F2', value = 0, size = 88, label }) {
+export default function Patch({ icon = 'Star', color = '#1F3F9A', soft = '#E2F1F2', value = 0, size = 88, label }) {
   const Icon = Icons[icon] || Icons.Star
   const R = 46, C = 2 * Math.PI * R
   return (

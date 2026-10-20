@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Mountain, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
+import Fleur from '../components/Fleur.jsx'
 import { useAuth } from '../lib/auth.jsx'
 import { DEMO } from '../lib/api.js'
 
@@ -40,7 +41,8 @@ export default function Login() {
   return (
     <div className="login">
       <section className="login-hero">
-        <div className="brand light"><span className="brand-mark"><Mountain size={22} /></span> Mi Progresión</div>
+        <div className="brand light"><span className="brand-mark"><Fleur size={24} /></span> Mi Progresión</div>
+        <Fleur className="login-fleur" size={300} outline={false} />
         <h1>Tu camino scout, paso a paso.</h1>
         <p>Marca lo que ya lograste, cuenta cómo lo hiciste y mira cuánto falta para tu próximo nivel.</p>
         <ul className="hero-points">
@@ -48,6 +50,7 @@ export default function Login() {
           <li>Tus adultos de programa revisan y te dejan comentarios</li>
           <li>Funciona en el celular</li>
         </ul>
+        <p className="motto">¡Siempre listo!</p>
         <svg className="topo" viewBox="0 0 400 400" aria-hidden="true">
           {[40, 80, 120, 160, 200, 240].map((r, i) => <ellipse key={r} cx="260" cy="250" rx={r * 1.15} ry={r * .8} transform={`rotate(${-18 + i * 3} 260 250)`} fill="none" stroke="#fff" strokeOpacity={.2 - i * .02} strokeWidth="1.6" />)}
         </svg>

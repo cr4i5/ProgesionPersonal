@@ -10,12 +10,12 @@ import Bar from '../components/Bar.jsx'
 export function Aventurero() {
   const { stats, adult } = useProgress()
   return (
-    <div className="page" style={{ '--c': '#0E7C86' }}>
+    <div className="page" style={{ '--c': '#1F3F9A' }}>
       <PageHead title="Aventurero" sub="Las 9 metas para empezar tu camino en la Tropa. Marca cada una cuando la completes." />
-      <Bar value={stats.av} total={AVENTURERO.length} color="#0E7C86" height={10} label="Aventurero" />
+      <Bar value={stats.av} total={AVENTURERO.length} color="#1F3F9A" height={10} label="Aventurero" />
       <p className="bar-caption">{stats.av} de {AVENTURERO.length} metas{stats.av === AVENTURERO.length ? ' · ¡Aventurero completado!' : ''}</p>
       <ul className="items">
-        {AVENTURERO.map((t, i) => <Item key={i} k={kAv(i + 1)} tag={String(i + 1)} text={t} color="#0E7C86" />)}
+        {AVENTURERO.map((t, i) => <Item key={i} k={kAv(i + 1)} tag={String(i + 1)} text={t} color="#1F3F9A" />)}
       </ul>
     </div>
   )

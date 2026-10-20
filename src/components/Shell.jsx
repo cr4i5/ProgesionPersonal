@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Link, Outlet } from 'react-router-dom'
-import { Home, Compass, Backpack, Medal, Tent, Award, NotebookPen, User, LogOut, Menu, X, ArrowLeft, ClipboardCheck, Mountain } from 'lucide-react'
+import { Home, Compass, Backpack, Medal, Tent, Award, NotebookPen, User, LogOut, Menu, X, ArrowLeft, ClipboardCheck } from 'lucide-react'
+import Fleur from './Fleur.jsx'
 import { useAuth } from '../lib/auth.jsx'
 import { useProgress } from '../lib/progress.jsx'
 
@@ -25,10 +26,10 @@ export default function Shell() {
     <div className={`shell ${adult ? 'adult-view' : ''}`}>
       <header className="topbar">
         <button className="icon-btn" onClick={() => setOpen(o => !o)} aria-label="Menú">{open ? <X /> : <Menu />}</button>
-        <Link to={adult ? '/panel' : '/'} className="brand sm"><Mountain size={20} /> Mi Progresión</Link>
+        <Link to={adult ? '/panel' : '/'} className="brand sm"><Fleur size={20} color="var(--murrey)" /> Mi Progresión</Link>
       </header>
       <aside className={`side ${open ? 'open' : ''}`}>
-        <Link to={adult ? '/panel' : '/'} className="brand" onClick={close}><span className="brand-mark"><Mountain size={22} /></span> Mi Progresión</Link>
+        <Link to={adult ? '/panel' : '/'} className="brand" onClick={close}><span className="brand-mark"><Fleur size={24} /></span> Mi Progresión</Link>
         {adult && (
           <div className="viewing">
             <Link to="/panel" className="back" onClick={close}><ArrowLeft size={15} /> Todos los jóvenes</Link>

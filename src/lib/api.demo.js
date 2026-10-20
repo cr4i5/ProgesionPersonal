@@ -1,12 +1,12 @@
 // Modo demo: todo se guarda en el navegador (localStorage). Sirve para probar el diseño sin Supabase.
 import { AREAS, AVENTURERO, kInd, kAv, kEsp, kVg, LEVELS } from './data.js'
 
-const LS = 'tropa-demo-v1'
+const LS = 'tropa-demo-v2'
 const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647 })()
 const uid = () => 'u' + Math.random().toString(36).slice(2, 10)
 
 function seed() {
-  const st = { users: [], items: {}, credits: [], session: null }
+  const st = { users: [], items: {}, credits: [], session: null, admin: {} }
   const add = (name, email, age, group, role, level) => {
     const id = uid(); st.users.push({ id, email, profile: { id, full_name: name, age, join_troop: '2023-03-04', join_current: '2024-02-10', scout_group: group, role, created_at: new Date().toISOString() } })
     st.items[id] = {}
@@ -24,12 +24,14 @@ function seed() {
     const r = rnd(); const rs = status !== 'completado' ? 'pendiente' : r < .45 ? 'aprobado' : r < .55 ? 'ajustes' : 'pendiente'
     st.items[id][k] = { user_id: id, item_key: k, status, note, review_status: rs, review_comment: rs === 'ajustes' ? 'Cuéntame un ejemplo concreto de cuándo lo hiciste.' : rs === 'aprobado' ? '¡Muy bien!' : null, updated_at: new Date(Date.now() - rnd() * 6e8).toISOString() }
   }
+  const ids = {}
   add('Profe Marcos (demo)', 'adulto@demo.com', null, 'Grupo Scout 1', 'adult', 0)
   add('Ana Pérez (demo)', 'ana@demo.com', 13, 'Grupo Scout 1', 'scout', .35)
   add('Luis Rojas', 'luis@demo.com', 11, 'Grupo Scout 1', 'scout', .12)
   add('Valentina Gómez', 'vale@demo.com', 15, 'Grupo Scout 2', 'scout', .7)
   add('Mateo Silva', 'mateo@demo.com', 12, 'Grupo Scout 2', 'scout', .22)
   add('Camila Díaz', 'camila@demo.com', 14, 'Grupo Scout 1', 'scout', .5)
+  st.users.filter(u => u.profile.role === 'scout').forEach((u, i) => { st.admin[u.id] = { asv_registered: i !== 1, asv_year: i !== 1 ? 2026 : null, medical_form: i % 2 === 0, medical_form_date: i % 2 === 0 ? '2026-02-14' : null } })
   return st
 }
 let S
@@ -71,6 +73,8 @@ export const db = {
   async addCredit(id, e) { const row = { id: uid(), user_id: id, review_status: 'pendiente', review_comment: null, created_at: new Date().toISOString(), ...e }; load().credits.unshift(row); save(); return row },
   async deleteCredit(id) { S.credits = S.credits.filter(c => c.id !== id); save() },
   async reviewCredit(id, { review_status, review_comment }) { Object.assign(S.credits.find(c => c.id === id), { review_status, review_comment: review_comment || null }); save() },
+  async getAdmin(id) { return wait(load().admin?.[id] || {}) },
+  async saveAdmin(id, patch) { const s = load(); s.admin = s.admin || {}; s.admin[id] = { ...(s.admin[id] || {}), ...patch }; save() },
   async summary() {
     const s = load()
     return wait(s.users.filter(u => u.profile.role === 'scout').map(u => {
@@ -82,7 +86,8 @@ export const db = {
         camp_done: done(r => r.item_key.includes(':camp:')), exc_done: done(r => r.item_key.includes(':exc:')),
         credits_total: cr.filter(c => c.review_status !== 'ajustes').reduce((a, c) => a + c.credits, 0),
         pending: done(r => !r.item_key.startsWith('note:') && r.review_status === 'pendiente') + cr.filter(c => c.review_status === 'pendiente').length,
-        last_activity: it.map(r => r.updated_at).sort().pop() || null }
+        last_activity: it.map(r => r.updated_at).sort().pop() || null,
+        asv_registered: !!s.admin?.[u.id]?.asv_registered, asv_year: s.admin?.[u.id]?.asv_year ?? null, medical_form: !!s.admin?.[u.id]?.medical_form, medical_form_date: s.admin?.[u.id]?.medical_form_date ?? null }
     }))
   },
 }

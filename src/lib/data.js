@@ -51,7 +51,7 @@ export const INDEX = {}
 AREAS.forEach(a => ['3', '4'].forEach(s => a.stages[s].forEach(it => {
   INDEX[kInd(a.id, s, it.k)] = { section: a.name, label: `Etapa ${s} · ${it.k.toUpperCase()}`, text: it.t, path: `areas/${a.id}`, color: a.c }
 })))
-AVENTURERO.forEach((t, i) => { INDEX[kAv(i + 1)] = { section: 'Aventurero', label: `Meta ${i + 1}`, text: t, path: 'aventurero', color: '#0E7C86' } })
+AVENTURERO.forEach((t, i) => { INDEX[kAv(i + 1)] = { section: 'Aventurero', label: `Meta ${i + 1}`, text: t, path: 'aventurero', color: '#1F3F9A' } })
 SPECIALTY_NUMBERS.forEach(n => METALS.forEach(m => {
   INDEX[kEsp(n, m.id)] = { section: 'Especialidades', label: `Especialidad ${n} · ${m.name}`, text: '', path: 'especialidades', color: m.c }
 }))

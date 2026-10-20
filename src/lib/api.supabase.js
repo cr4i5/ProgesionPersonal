@@ -44,5 +44,11 @@ export const db = {
   async reviewCredit(id, { review_status, review_comment }) {
     must(await sb.from('credit_entries').update({ review_status, review_comment: review_comment || null }).eq('id', id))
   },
+  async getAdmin(uid) {
+    const { data, error } = await sb.from('member_admin').select('*').eq('user_id', uid).maybeSingle()
+    if (error) return null // la tabla aún no existe: la función queda oculta
+    return data || {}
+  },
+  async saveAdmin(uid, patch) { must(await sb.from('member_admin').upsert({ user_id: uid, ...patch }, { onConflict: 'user_id' })) },
   async summary() { return must(await sb.rpc('scout_summary')) },
 }

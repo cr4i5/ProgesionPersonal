@@ -5,6 +5,8 @@ import { AREAS, LEVELS, AVENTURERO, TOTAL_INDICATORS } from '../lib/data.js'
 import Patch from '../components/Patch.jsx'
 import Trail from '../components/Trail.jsx'
 import Bar from '../components/Bar.jsx'
+import Fleur from '../components/Fleur.jsx'
+import AdminCard from '../components/AdminCard.jsx'
 import { INDEX } from '../lib/data.js'
 
 export default function Home() {
@@ -16,11 +18,12 @@ export default function Home() {
   return (
     <div className="page">
       <section className="hero">
+        <Fleur className="hero-fleur" size={190} />
         <div className="hero-text">
           <h1>{adult ? `Progresión de ${first}` : `¡Hola, ${first}!`}</h1>
           <p className="lead">
-            {lvl ? <>Ya completaste el nivel <b>{lvl.name}</b>.</> : <>Llevas <b>{stats.ind}</b> indicadores marcados.</>}{' '}
-            {next ? <>Para <b>{next.name}</b> te faltan <b>{next.threshold + 1 - stats.ind}</b>.</> : <>¡Llegaste a la cima!</>}
+            {lvl ? <>{adult ? 'Completó' : 'Ya completaste'} el nivel <b>{lvl.name}</b>.</> : <>{adult ? 'Lleva' : 'Llevas'} <b>{stats.ind}</b> indicadores marcados.</>}{' '}
+            {next ? <>Para <b>{next.name}</b> {adult ? 'le' : 'te'} faltan <b>{next.threshold + 1 - stats.ind}</b>.</> : <>{adult ? 'Llegó a la cima.' : '¡Llegaste a la cima!'}</>}
           </p>
           <div className="hero-count">
             <div><strong>{stats.ind}</strong><span>de {TOTAL_INDICATORS} indicadores</span></div>
@@ -30,6 +33,8 @@ export default function Home() {
         </div>
         <Trail count={stats.ind} level={lvl} />
       </section>
+
+      <AdminCard />
 
       {stats.feedback.length > 0 && (
         <section className="callout warn">

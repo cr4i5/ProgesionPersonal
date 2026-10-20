@@ -4,7 +4,7 @@ import { Check, AlertCircle } from 'lucide-react'
 const UI = createContext(null)
 export const useUI = () => useContext(UI)
 
-const CONFETTI = ['#FF6B2C', '#FFC933', '#0E7C86', '#3F8F4E', '#8A5CD6', '#D83F7B']
+const CONFETTI = ['#FFC20E', '#D4162B', '#1F3F9A', '#7B1E3A', '#FFC20E', '#1F3F9A']
 
 export function UIProvider({ children }) {
   const [toasts, setToasts] = useState([])
