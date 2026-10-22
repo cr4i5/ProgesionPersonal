@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
-import Fleur from '../components/Fleur.jsx'
+import Fleur, { BrandLogo } from '../components/Fleur.jsx'
 import { useAuth } from '../lib/auth.jsx'
 import { DEMO } from '../lib/api.js'
 
@@ -41,8 +41,8 @@ export default function Login() {
   return (
     <div className="login">
       <section className="login-hero">
-        <div className="brand light"><span className="brand-mark"><Fleur size={24} /></span> Mi Progresión</div>
-        <Fleur className="login-fleur" size={300} outline={false} />
+        <div className="brand light"><BrandLogo /> Mi Progresión</div>
+        <Fleur className="login-fleur" size={300} color="#fff" />
         <h1>Tu camino scout, paso a paso.</h1>
         <p>Marca lo que ya lograste, cuenta cómo lo hiciste y mira cuánto falta para tu próximo nivel.</p>
         <ul className="hero-points">

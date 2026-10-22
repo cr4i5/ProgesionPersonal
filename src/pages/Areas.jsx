@@ -21,7 +21,7 @@ export function AreasIndex() {
               <Patch icon={a.icon} color={a.c} soft={a.soft} value={s.done / a.total} size={84} label={a.name} />
               <div>
                 <h3>{a.n}. {a.name}</h3>
-                <p>Etapa 3: {s.stages['3'].done}/{s.stages['3'].total} · Etapa 4: {s.stages['4'].done}/{s.stages['4'].total}</p>
+                <p><span>Etapa 3: {s.stages['3'].done}/{s.stages['3'].total}</span><span>Etapa 4: {s.stages['4'].done}/{s.stages['4'].total}</span></p>
                 <Bar value={s.done} total={a.total} approved={s.approved} color={a.c} height={6} label={a.name} />
               </div>
             </Link>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Download, Clock, ChevronRight, LogOut } from 'lucide-react'
-import Fleur from '../components/Fleur.jsx'
+import Fleur, { BrandLogo } from '../components/Fleur.jsx'
 import { db } from '../lib/api.js'
 import { useAuth } from '../lib/auth.jsx'
 import { LEVELS, TOTAL_INDICATORS } from '../lib/data.js'
@@ -35,7 +35,7 @@ export default function Panel() {
   return (
     <div className="panel-wrap">
       <header className="panel-top">
-        <span className="brand"><span className="brand-mark"><Fleur size={24} /></span> Mi Progresión · Adultos</span>
+        <span className="brand"><BrandLogo /> Mi Progresión · Adultos</span>
         <span className="grow" />
         <span className="who">{profile?.full_name}</span>
         <button className="link-btn" onClick={signOut}><LogOut size={15} /> Salir</button>

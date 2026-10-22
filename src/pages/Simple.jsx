@@ -53,7 +53,7 @@ export function VidaGrupo() {
   const L = LEVELS.find(l => l.id === lv)
   const count = kind => Object.values(items).filter(r => r.item_key.startsWith(`vg:${lv}:${kind}:`) && r.status === 'completado').length
   const group = (kind, label, total) => (
-    <section className="card">
+    <section className="card spec">
       <h3>{label} <small>{count(kind)}/{total}</small></h3>
       <ul className="items flat">
         {Array.from({ length: total }, (_, i) => (

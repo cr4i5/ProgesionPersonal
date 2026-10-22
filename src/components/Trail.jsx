@@ -19,6 +19,7 @@ export default function Trail({ count, level }) {
   return (
     <svg className="trail" viewBox="0 0 340 400" role="img" aria-label={`Llevas ${count} indicadores de ${MAX}`}>
       <defs>
+        <mask id="fl" maskUnits="userSpaceOnUse" x="247" y="1" width="30" height="30"><image href="/fleur.png" x="247" y="1" width="30" height="30" /></mask>
         <pattern id="topo" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M0 30 Q15 10 30 30 T60 30" fill="none" stroke="#1F3F9A" strokeOpacity=".08" strokeWidth="1.5" /></pattern>
       </defs>
       <rect width="340" height="400" rx="26" fill="url(#topo)" />
@@ -43,7 +44,7 @@ export default function Trail({ count, level }) {
           <circle r="10" fill="#7B1E3A" stroke="#fff" strokeWidth="3" />
         </g>
       )}
-      <g transform="translate(247 1) scale(.3)" fill={level?.id === 'bolivar' ? '#FFC20E' : '#7B1E3A'} opacity={level?.id === 'bolivar' ? 1 : .85}><path d="M50 4C61 18 64 36 50 58 36 36 39 18 50 4ZM43 56C30 60 12 52 12 32c0-8 6-12 11-10-3 6-1 12 7 16 4 2 10 6 16 14ZM57 56c13 4 31-4 31-24 0-8-6-12-11-10 3 6 1 12-7 16-4 2-10 6-16 14ZM31 60h38v8H31ZM41 69c3 11 6 19 9 27 3-8 6-16 9-27Z" stroke={level?.id === 'bolivar' ? '#7B1E3A' : 'none'} strokeWidth="4" paintOrder="stroke" /></g>
+      <rect x="247" y="1" width="30" height="30" fill={level?.id === 'bolivar' ? '#7B1E3A' : '#B5BBD0'} mask="url(#fl)" />
     </svg>
   )
 }
