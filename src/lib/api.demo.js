@@ -1,14 +1,16 @@
 // Modo demo: todo se guarda en el navegador (localStorage). Sirve para probar el diseño sin Supabase.
 import { AREAS, AVENTURERO, kInd, kAv, kEsp, kVg, LEVELS } from './data.js'
 
-const LS = 'tropa-demo-v2'
+const LS = 'tropa-demo-v3'
 const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647 })()
 const uid = () => 'u' + Math.random().toString(36).slice(2, 10)
 
 function seed() {
   const st = { users: [], items: {}, credits: [], session: null, admin: {} }
+  const PAT = ['Águilas', 'Lobos', 'Halcones', 'Águilas', 'Lobos']
+  let pi = 0
   const add = (name, email, age, group, role, level) => {
-    const id = uid(); st.users.push({ id, email, profile: { id, full_name: name, age, join_troop: '2023-03-04', join_current: '2024-02-10', scout_group: group, role, created_at: new Date().toISOString() } })
+    const id = uid(); st.users.push({ id, email, profile: { id, full_name: name, age, join_troop: '2023-03-04', join_current: '2024-02-10', scout_group: group, patrol: role === 'scout' ? PAT[pi++ % PAT.length] : null, role, created_at: new Date().toISOString() } })
     st.items[id] = {}
     if (role === 'scout') {
       const keys = []
@@ -51,7 +53,7 @@ export const auth = {
   async signUp({ email, password, adult_code, ...meta }) {
     const s = load(); if (s.users.some(u => u.email === email.toLowerCase())) throw new Error('User already registered')
     if (adult_code && adult_code !== 'DEMO') throw new Error('Database error saving new user')
-    const id = uid(); s.users.push({ id, email: email.toLowerCase(), profile: { id, full_name: meta.full_name, age: meta.age ? +meta.age : null, join_troop: meta.join_troop || null, join_current: meta.join_current || null, scout_group: meta.scout_group || null, role: adult_code ? 'adult' : 'scout', created_at: new Date().toISOString() } })
+    const id = uid(); s.users.push({ id, email: email.toLowerCase(), profile: { id, full_name: meta.full_name, age: meta.age ? +meta.age : null, join_troop: meta.join_troop || null, join_current: meta.join_current || null, scout_group: meta.scout_group || null, patrol: meta.patrol || null, role: adult_code ? 'adult' : 'scout', created_at: new Date().toISOString() } })
     s.items[id] = {}; s.session = id; save(); listener({ id, email }); return {}
   },
   async signOut() { S.session = null; save(); listener(null) },
@@ -80,7 +82,7 @@ export const db = {
     return wait(s.users.filter(u => u.profile.role === 'scout').map(u => {
       const it = Object.values(s.items[u.id] || {}); const done = f => it.filter(r => r.status === 'completado' && f(r)).length
       const cr = s.credits.filter(c => c.user_id === u.id)
-      return { user_id: u.id, full_name: u.profile.full_name, age: u.profile.age, scout_group: u.profile.scout_group, join_current: u.profile.join_current,
+      return { user_id: u.id, full_name: u.profile.full_name, age: u.profile.age, scout_group: u.profile.scout_group, patrol: u.profile.patrol, join_current: u.profile.join_current,
         ind_done: done(r => r.item_key.startsWith('ind:')), ind_approved: done(r => r.item_key.startsWith('ind:') && r.review_status === 'aprobado'),
         av_done: done(r => r.item_key.startsWith('av:')), esp_done: done(r => r.item_key.startsWith('esp:')),
         camp_done: done(r => r.item_key.includes(':camp:')), exc_done: done(r => r.item_key.includes(':exc:')),

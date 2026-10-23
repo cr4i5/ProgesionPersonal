@@ -8,25 +8,30 @@ import { LEVELS, TOTAL_INDICATORS } from '../lib/data.js'
 import { levelOfIndicators, ago } from '../lib/stats.js'
 import Bar from '../components/Bar.jsx'
 
+const isIdle = r => !r.last_activity || Date.now() - new Date(r.last_activity) > 30 * 864e5
+
 export default function Panel() {
   const { signOut, profile } = useAuth()
   const [rows, setRows] = useState(null)
   const [err, setErr] = useState(false)
   const [q, setQ] = useState('')
   const [group, setGroup] = useState('')
+  const [patrol, setPatrol] = useState('')
   const [onlyPending, setOnlyPending] = useState(false)
   const [noAsv, setNoAsv] = useState(false)
   const [noMed, setNoMed] = useState(false)
+  const [idle, setIdle] = useState(false)
   useEffect(() => { db.summary().then(setRows).catch(() => setErr(true)) }, [])
 
   const groups = useMemo(() => [...new Set((rows || []).map(r => r.scout_group).filter(Boolean))].sort(), [rows])
+  const patrols = useMemo(() => [...new Set((rows || []).map(r => (r.patrol || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b)), [rows])
   const list = useMemo(() => (rows || []).filter(r =>
-    r.full_name.toLowerCase().includes(q.toLowerCase()) && (!group || r.scout_group === group) && (!onlyPending || r.pending > 0) && (!noAsv || r.asv_registered === false) && (!noMed || r.medical_form === false)
-  ).sort((a, b) => (b.pending - a.pending) || a.full_name.localeCompare(b.full_name)), [rows, q, group, onlyPending, noAsv, noMed])
+    r.full_name.toLowerCase().includes(q.toLowerCase()) && (!group || r.scout_group === group) && (!patrol || (r.patrol || '').trim() === patrol) && (!onlyPending || r.pending > 0) && (!noAsv || r.asv_registered === false) && (!noMed || r.medical_form === false) && (!idle || isIdle(r))
+  ).sort((a, b) => (b.pending - a.pending) || a.full_name.localeCompare(b.full_name)), [rows, q, group, patrol, onlyPending, noAsv, noMed, idle])
 
   function exportCsv() {
-    const head = ['Nombre', 'Edad', 'Grupo', 'Indicadores marcados', 'Indicadores aprobados', 'Nivel', 'Aventurero (de 9)', 'Especialidades', 'Campamentos', 'Excursiones', 'Créditos', 'Pendientes de revisión', 'Última actividad', 'Inscrito ASV', 'Año inscripción', 'Ficha médica entregada']
-    const lines = (rows || []).map(r => [r.full_name, r.age ?? '', r.scout_group ?? '', r.ind_done, r.ind_approved, levelOfIndicators(r.ind_done)?.name || 'En camino', r.av_done, r.esp_done, r.camp_done, r.exc_done, r.credits_total, r.pending, r.last_activity?.slice(0, 10) ?? '', r.asv_registered ? 'Sí' : 'No', r.asv_year ?? '', r.medical_form ? 'Sí' : 'No'])
+    const head = ['Nombre', 'Edad', 'Grupo', 'Patrulla', 'Indicadores marcados', 'Indicadores aprobados', 'Nivel', 'Aventurero (de 9)', 'Especialidades', 'Campamentos', 'Excursiones', 'Créditos', 'Pendientes de revisión', 'Última actividad', 'Inscrito ASV', 'Año inscripción', 'Ficha médica entregada']
+    const lines = (rows || []).map(r => [r.full_name, r.age ?? '', r.scout_group ?? '', r.patrol ?? '', r.ind_done, r.ind_approved, levelOfIndicators(r.ind_done)?.name || 'En camino', r.av_done, r.esp_done, r.camp_done, r.exc_done, r.credits_total, r.pending, r.last_activity?.slice(0, 10) ?? '', r.asv_registered ? 'Sí' : 'No', r.asv_year ?? '', r.medical_form ? 'Sí' : 'No'])
     const csv = [head, ...lines].map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })); a.download = 'progresion-tropa.csv'; a.click()
   }
@@ -55,6 +60,8 @@ export default function Panel() {
             <div className="filters">
               <label className="search"><Search size={17} /><input placeholder="Buscar por nombre" value={q} onChange={e => setQ(e.target.value)} aria-label="Buscar por nombre" /></label>
               <select value={group} onChange={e => setGroup(e.target.value)} aria-label="Grupo"><option value="">Todos los grupos</option>{groups.map(g => <option key={g}>{g}</option>)}</select>
+              <select value={patrol} onChange={e => setPatrol(e.target.value)} aria-label="Patrulla"><option value="">Todas las patrullas</option>{patrols.map(g => <option key={g}>{g}</option>)}</select>
+              <label className="check-inline"><input type="checkbox" checked={idle} onChange={e => setIdle(e.target.checked)} /> Sin actividad (30 días)</label>
               <label className="check-inline"><input type="checkbox" checked={onlyPending} onChange={e => setOnlyPending(e.target.checked)} /> Solo con pendientes</label>
               {rows.some(r => r.asv_registered !== undefined) && <>
                 <label className="check-inline"><input type="checkbox" checked={noAsv} onChange={e => setNoAsv(e.target.checked)} /> Sin inscripción ASV</label>
@@ -69,8 +76,8 @@ export default function Panel() {
                   <li key={r.user_id}>
                     <Link to={`/panel/${r.user_id}`} className="scout-row">
                       <div className="avatar" aria-hidden="true">{r.full_name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}</div>
-                      <div className="sr-name"><b>{r.full_name}</b><span>{r.age ? `${r.age} años · ` : ''}{r.scout_group || 'Sin grupo'} · {ago(r.last_activity)}</span>
-                        {r.asv_registered !== undefined && <span className="sr-flags"><em className={`tag ${r.asv_registered ? 'ok' : 'wait'}`}>{r.asv_registered ? 'ASV ✓' : 'Sin ASV'}</em><em className={`tag ${r.medical_form ? 'ok' : 'wait'}`}>{r.medical_form ? 'Ficha ✓' : 'Sin ficha'}</em></span>}</div>
+                      <div className="sr-name"><b>{r.full_name}</b><span>{r.age ? `${r.age} años · ` : ''}{r.scout_group || 'Sin grupo'}{r.patrol ? ` · Patrulla ${r.patrol}` : ''} · {ago(r.last_activity)}</span>
+                        {(r.asv_registered !== undefined || isIdle(r)) && <span className="sr-flags">{isIdle(r) && <em className="tag neutral">Sin actividad</em>}{r.asv_registered !== undefined && <><em className={`tag ${r.asv_registered ? 'ok' : 'wait'}`}>{r.asv_registered ? 'ASV ✓' : 'Sin ASV'}</em><em className={`tag ${r.medical_form ? 'ok' : 'wait'}`}>{r.medical_form ? 'Ficha ✓' : 'Sin ficha'}</em></>}</span>}</div>
                       <div className="sr-prog">
                         <div className="sr-top"><span>{r.ind_done}<small>/{TOTAL_INDICATORS}</small></span><em className={`lvl ${lvl ? lvl.id : ''}`}>{lvl && <span className="lvl-fleur"><Fleur size={13} /></span>}{lvl ? lvl.name : 'En camino'}</em></div>
                         <Bar value={r.ind_done} total={LEVELS[2].goal} approved={r.ind_approved} color="var(--lake)" height={7} label="Indicadores" />

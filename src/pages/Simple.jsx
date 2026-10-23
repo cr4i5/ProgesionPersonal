@@ -104,12 +104,12 @@ export function Cuaderno() {
 export function Perfil() {
   const { profile, updateProfile, user } = useAuth()
   const { toast } = useUI()
-  const [f, setF] = useState({ full_name: profile.full_name || '', age: profile.age ?? '', join_troop: profile.join_troop || '', join_current: profile.join_current || '', scout_group: profile.scout_group || '' })
+  const [f, setF] = useState({ full_name: profile.full_name || '', age: profile.age ?? '', join_troop: profile.join_troop || '', join_current: profile.join_current || '', scout_group: profile.scout_group || '', patrol: profile.patrol || '' })
   const [busy, setBusy] = useState(false)
   const set = k => e => setF({ ...f, [k]: e.target.value })
   async function submit(e) {
     e.preventDefault(); setBusy(true)
-    try { await updateProfile({ full_name: f.full_name.trim(), age: f.age === '' ? null : +f.age, join_troop: f.join_troop || null, join_current: f.join_current || null, scout_group: f.scout_group.trim() || null }); toast('Perfil guardado') }
+    try { await updateProfile({ full_name: f.full_name.trim(), age: f.age === '' ? null : +f.age, join_troop: f.join_troop || null, join_current: f.join_current || null, scout_group: f.scout_group.trim() || null, patrol: f.patrol.trim() || null }); toast('Perfil guardado') }
     catch { toast('No se pudo guardar el perfil', 'err') } finally { setBusy(false) }
   }
   return (
@@ -121,6 +121,8 @@ export function Perfil() {
           <label>Edad<input type="number" min="5" max="99" value={f.age} onChange={set('age')} /></label>
           <label>Grupo scout<input value={f.scout_group} onChange={set('scout_group')} /></label>
         </div>
+        <label>Mi patrulla<input required maxLength={40} value={f.patrol} onChange={set('patrol')} placeholder="Ej: Águilas, Lobos, Halcones…" autoComplete="off" />
+          <span className="hint">Si cambias de patrulla, actualízalo aquí.</span></label>
         <div className="row2">
           <label>Fecha de ingreso (Tropa)<input type="date" value={f.join_troop} onChange={set('join_troop')} /></label>
           <label>Fecha de ingreso (Tropa actual)<input type="date" value={f.join_current} onChange={set('join_current')} /></label>

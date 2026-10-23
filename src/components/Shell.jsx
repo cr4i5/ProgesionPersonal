@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, Link, Outlet } from 'react-router-dom'
-import { Home, Compass, Backpack, Medal, Tent, Award, NotebookPen, User, LogOut, Menu, X, ArrowLeft, ClipboardCheck } from 'lucide-react'
+import { Printer, Home, Compass, Backpack, Medal, Tent, Award, NotebookPen, User, LogOut, Menu, X, ArrowLeft, ClipboardCheck } from 'lucide-react'
 import Fleur, { BrandLogo } from './Fleur.jsx'
 import { useAuth } from '../lib/auth.jsx'
 import { useProgress } from '../lib/progress.jsx'
@@ -35,6 +35,7 @@ export default function Shell() {
             <Link to="/panel" className="back" onClick={close}><ArrowLeft size={15} /> Todos los jóvenes</Link>
             <b>{person?.full_name}</b>
             <span>{person?.age ? `${person.age} años · ` : ''}{person?.scout_group || 'Sin grupo'}</span>
+            <span>Patrulla: {person?.patrol || 'sin indicar'}</span>
           </div>
         )}
         <nav>
@@ -48,6 +49,7 @@ export default function Shell() {
         <div className="side-foot">
           {!adult && <span className="who">{profile?.full_name}</span>}
           {adult && <Link to="/panel" className="who" onClick={close}>Panel de adultos</Link>}
+          <button className="link-btn" onClick={() => window.print()}><Printer size={15} /> Imprimir esta página</button>
           <button className="link-btn" onClick={signOut}><LogOut size={15} /> Salir</button>
         </div>
       </aside>

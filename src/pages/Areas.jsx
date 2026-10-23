@@ -45,8 +45,9 @@ export function PageHead({ title, sub, color, icon }) {
 export function AreaPage() {
   const { id } = useParams()
   const a = AREA[id]
-  const { stats, base, adult } = useProgress()
+  const { stats, base, adult, items } = useProgress()
   const [stage, setStage] = useState('3')
+  const [onlyOpen, setOnlyOpen] = useState(false)
   if (!a) return <Navigate to={`${base || ''}/areas`} replace />
   const s = stats.areas[a.id]
   const st = s.stages[stage]
@@ -69,8 +70,9 @@ export function AreaPage() {
         ))}
       </div>
       {!adult && <p className="tip">Cuando cumplas un indicador, tócalo para marcarlo. Tus adultos lo revisarán.</p>}
+      <label className="check-inline"><input type="checkbox" checked={onlyOpen} onChange={e => setOnlyOpen(e.target.checked)} /> Mostrar solo los que me faltan</label>
       <ul className="items">
-        {a.stages[stage].map(it => <Item key={it.k} k={kInd(a.id, stage, it.k)} tag={it.k.toUpperCase()} text={it.t} color={a.c} />)}
+        {a.stages[stage].filter(it => !onlyOpen || items[kInd(a.id, stage, it.k)]?.status !== 'completado').map(it => <Item key={it.k} k={kInd(a.id, stage, it.k)} tag={it.k.toUpperCase()} text={it.t} color={a.c} />)}
       </ul>
       {st.done === st.total && <p className="done-banner"><Fleur size={22} color="var(--ok)" /> ¡Completaste la etapa {stage} de {a.name}!</p>}
     </div>

@@ -18,7 +18,7 @@ const ERR = (m = '', adultTry) => {
 export default function Login() {
   const { signIn, signUp, resetPassword } = useAuth()
   const [tab, setTab] = useState('in')
-  const [f, setF] = useState({ email: '', password: '', full_name: '', age: '', scout_group: '', join_troop: '', join_current: '', adult_code: '' })
+  const [f, setF] = useState({ email: '', password: '', full_name: '', age: '', scout_group: '', patrol: '', join_troop: '', join_current: '', adult_code: '' })
   const [adult, setAdult] = useState(false)
   const [show, setShow] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -31,7 +31,7 @@ export default function Login() {
       if (tab === 'in') await signIn(f.email.trim().toLowerCase(), f.password)
       else if (tab === 'up') {
         const r = await signUp({ email: f.email.trim().toLowerCase(), password: f.password, full_name: f.full_name.trim(), age: adult ? '' : f.age,
-          scout_group: f.scout_group.trim(), join_troop: adult ? '' : f.join_troop, join_current: adult ? '' : f.join_current, adult_code: adult ? f.adult_code.trim() : '' })
+          scout_group: f.scout_group.trim(), patrol: adult ? '' : f.patrol.trim(), join_troop: adult ? '' : f.join_troop, join_current: adult ? '' : f.join_current, adult_code: adult ? f.adult_code.trim() : '' })
         if (r?.needsConfirm) setMsg({ ok: true, t: 'Cuenta creada. Revisa tu correo y toca el enlace de confirmación para entrar.' })
       } else { await resetPassword(f.email.trim().toLowerCase()); setMsg({ ok: true, t: 'Si ese correo tiene cuenta, te enviamos un enlace para crear una contraseña nueva.' }) }
     } catch (err) { setMsg({ t: ERR(err.message, adult) }) }
@@ -71,6 +71,7 @@ export default function Login() {
               <label>Edad<input required type="number" min="8" max="18" value={f.age} onChange={set('age')} /></label>
               <label>Grupo scout<input value={f.scout_group} onChange={set('scout_group')} /></label>
             </div>}
+            {!adult && <label>Patrulla<input required maxLength={40} value={f.patrol} onChange={set('patrol')} placeholder="Ej: Águilas, Lobos, Halcones…" autoComplete="off" /></label>}
             {adult && <><label>Grupo scout<input value={f.scout_group} onChange={set('scout_group')} /></label>
               <label>Código de adulto<input required value={f.adult_code} onChange={set('adult_code')} autoComplete="off" /></label></>}
             {!adult && <div className="row2">

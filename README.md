@@ -46,3 +46,10 @@ Si ya instalaste la versión anterior, corre **una vez** `supabase/migracion_2_r
 - Los adultos marcan por joven: *inscrito en la ASV (IMPEESA)* + año, y *ficha médica entregada* + fecha. El joven solo lo ve.
 - **No se guarda ningún dato médico** en esta web. El contenido de la ficha se queda en el papel o en IMPEESA.
 - Esta web **no se conecta con IMPEESA** (no hay API pública ni autorización). Si la ASV la habilita, se puede integrar después.
+
+## Actualización 3: patrulla y mejoras
+Corre **una vez** `supabase/migracion_3_patrulla.sql` en el SQL Editor **antes** de subir esta versión a GitHub. Sin ella, guardar la patrulla desde "Mi perfil" dará error.
+- Nuevos registros: la patrulla es obligatoria. Los ya registrados ven un aviso en Inicio que los lleva a "Mi perfil".
+- Panel de adultos: patrulla en cada joven, filtro por patrulla, filtro "sin actividad (30 días)" y columna Patrulla en el CSV.
+- Joven: insignias automáticas, sugerencia de "siguiente paso", filtro "solo los que me faltan" en cada área, confirmación al desmarcar algo ya aprobado, botón imprimir.
+- Instalable en el celular ("Agregar a pantalla de inicio") con ícono de flor de lis.

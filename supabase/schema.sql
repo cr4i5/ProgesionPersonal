@@ -11,6 +11,7 @@ create table if not exists public.profiles (
   join_troop   date,
   join_current date,
   scout_group  text,
+  patrol       text,
   role         text not null default 'scout' check (role in ('scout','adult')),
   created_at   timestamptz not null default now()
 );
@@ -39,10 +40,10 @@ begin
       raise exception 'Código de adulto incorrecto';
     end if;
   end if;
-  insert into public.profiles (id, full_name, age, join_troop, join_current, scout_group, role)
+  insert into public.profiles (id, full_name, age, join_troop, join_current, scout_group, patrol, role)
   values (new.id, coalesce(meta->>'full_name',''), nullif(meta->>'age','')::int,
           nullif(meta->>'join_troop','')::date, nullif(meta->>'join_current','')::date,
-          nullif(meta->>'scout_group',''), r);
+          nullif(meta->>'scout_group',''), nullif(left(trim(meta->>'patrol'),60),''), r);
   return new;
 end $$;
 
@@ -185,7 +186,7 @@ create policy ma_update on public.member_admin for update using (public.is_adult
 
 drop function if exists public.scout_summary();
 create or replace function public.scout_summary()
-returns table (user_id uuid, full_name text, age int, scout_group text, join_current date,
+returns table (user_id uuid, full_name text, age int, scout_group text, patrol text, join_current date,
                ind_done int, ind_approved int, av_done int, esp_done int, camp_done int, exc_done int,
                credits_total int, pending int, last_activity timestamptz,
                asv_registered boolean, asv_year int, medical_form boolean, medical_form_date date)
@@ -193,7 +194,7 @@ language plpgsql stable security definer set search_path = public as $$
 begin
   if not public.is_adult() then raise exception 'Solo para adultos del programa'; end if;
   return query
-  select p.id, p.full_name, p.age, p.scout_group, p.join_current,
+  select p.id, p.full_name, p.age, p.scout_group, p.patrol, p.join_current,
     coalesce(i.ind_done,0)::int, coalesce(i.ind_approved,0)::int, coalesce(i.av_done,0)::int,
     coalesce(i.esp_done,0)::int, coalesce(i.camp_done,0)::int, coalesce(i.exc_done,0)::int,
     coalesce(c.credits_total,0)::int,

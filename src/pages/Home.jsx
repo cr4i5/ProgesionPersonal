@@ -7,10 +7,15 @@ import Trail from '../components/Trail.jsx'
 import Bar from '../components/Bar.jsx'
 import Fleur from '../components/Fleur.jsx'
 import AdminCard from '../components/AdminCard.jsx'
+import Badges from '../components/Badges.jsx'
+import NextStep from '../components/NextStep.jsx'
+import { useAuth } from '../lib/auth.jsx'
+import { Flag } from 'lucide-react'
 import { INDEX } from '../lib/data.js'
 
 export default function Home() {
   const { stats, person, base, adult, items } = useProgress()
+  const { profile } = useAuth()
   const b = base || ''
   const first = (person?.full_name || '').split(' ')[0]
   const next = LEVELS.find(l => stats.ind <= l.threshold)
@@ -34,6 +39,12 @@ export default function Home() {
         <Trail count={stats.ind} level={lvl} />
       </section>
 
+      {!adult && profile && !profile.patrol && (
+        <Link to="/perfil" className="callout notice">
+          <Flag size={22} /><div><b>Cuéntanos a qué patrulla perteneces</b><span>Agrégalo en Mi perfil. Solo toma un momento.</span></div><ChevronRight size={20} />
+        </Link>
+      )}
+
       <AdminCard />
 
       {stats.feedback.length > 0 && (
@@ -55,6 +66,8 @@ export default function Home() {
           </ul>
         </section>
       )}
+
+      {!adult && <NextStep items={items} stats={stats} base={b} />}
 
       <h2 className="h-section">Las seis áreas</h2>
       <div className="area-grid">
@@ -81,6 +94,8 @@ export default function Home() {
         <Link to={`${b}/vida-de-grupo`} className="tile"><Mountain /><strong>{stats.excs}</strong><span>Excursiones</span></Link>
         <Link to={`${b}/creditos`} className="tile"><Award /><strong>{stats.credits}<small>/{stats.credMin}</small></strong><span>Créditos (mínimo {stats.credMin})</span></Link>
       </div>
+
+      <Badges stats={stats} />
     </div>
   )
 }

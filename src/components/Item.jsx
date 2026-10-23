@@ -73,6 +73,8 @@ export default function Item({ k, tag, text, color = '#1F3F9A', variant = 'check
   const hasNote = Boolean(row?.note)
 
   const set = s => {
+    if (status === 'completado' && s !== 'completado' && row?.review_status === 'aprobado' &&
+        !window.confirm('Tus adultos ya aprobaron este logro. Si lo cambias, tendrán que revisarlo otra vez. ¿Quieres continuar?')) return
     save(k, { status: s, note: row?.note || '' })
     if (s === 'completado') { toast(MSGS[Math.floor(Math.random() * MSGS.length)]); }
   }
