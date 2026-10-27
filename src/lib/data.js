@@ -23,7 +23,7 @@ export const CREDITS_MIN = 16
 
 // Metas por nivel (igual que en el Excel: "Completado" cuando supera el umbral)
 export const LEVELS = [
-  { id: 'explorador', name: 'Explorador', goal: 90,  threshold: 80,  camps: 6, excs: 12 },
+  { id: 'explorador', name: 'Explorador', goal: 90,  threshold: 80,  camps: 6, excs: 12, credits: 16 },
   { id: 'pionero',    name: 'Pionero',    goal: 140, threshold: 110, camps: 3, excs: 6 },
   { id: 'bolivar',    name: 'Scout de Bolívar', goal: 177, threshold: 135, camps: 4, excs: 8 },
 ]

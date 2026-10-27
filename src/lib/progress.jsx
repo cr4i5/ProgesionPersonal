@@ -51,8 +51,9 @@ export function ProgressProvider({ userId, mode, base, children }) {
   }, [items, userId, fail, toast])
 
   const addCredit = useCallback(async e => {
-    try { const row = await db.addCredit(userId, e); setCredits(c => [row, ...c]); return true } catch { fail(); return false }
-  }, [userId, fail])
+    if (mode !== 'adult') return false // los créditos los registran los adultos
+    try { await db.adultAddCredits([{ user_id: userId, ...e }]); setCredits(await db.listCredits(userId)); return true } catch { fail(); return false }
+  }, [userId, mode, fail])
   const deleteCredit = useCallback(async id => {
     const prev = credits; setCredits(c => c.filter(x => x.id !== id))
     try { await db.deleteCredit(id) } catch { setCredits(prev); fail() }

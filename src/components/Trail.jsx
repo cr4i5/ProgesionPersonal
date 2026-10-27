@@ -5,7 +5,7 @@ const D = 'M62 372 C 62 336, 282 346, 282 296 S 58 268, 68 218 S 282 196, 272 14
 const MAX = LEVELS[2].goal
 
 // El camino: avanzas por la montaña según tus indicadores completados.
-export default function Trail({ count, level }) {
+export default function Trail({ count, level, reached = [] }) {
   const path = useRef()
   const [len, setLen] = useState(0)
   const [pts, setPts] = useState([])
@@ -27,12 +27,12 @@ export default function Trail({ count, level }) {
       <path ref={path} d={D} fill="none" stroke="#C9D9D7" strokeWidth="9" strokeLinecap="round" strokeDasharray="1 14" />
       {len > 0 && <path d={D} fill="none" stroke="var(--trail)" strokeWidth="9" strokeLinecap="round" strokeDasharray={`${len * frac} ${len}`} style={{ transition: 'stroke-dasharray .9s ease' }} />}
       {pts.map((p, i) => {
-        const reached = count > (LEVELS[i - 1]?.threshold ?? -1) && i > 0
+        const got = i > 0 && reached.includes(LEVELS[i - 1].id)
         const right = p.x < 170
         return (
           <g key={p.name}>
-            <circle cx={p.x} cy={p.y} r="12" fill={i === 0 || reached ? 'var(--trail)' : '#fff'} stroke={i === 0 || reached ? 'var(--trail)' : '#9DB3B1'} strokeWidth="3" />
-            {(i === 0 || reached) && <path d={`M${p.x - 5} ${p.y} l3.5 3.5 l6.5 -7`} fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />}
+            <circle cx={p.x} cy={p.y} r="12" fill={i === 0 || got ? 'var(--trail)' : '#fff'} stroke={i === 0 || got ? 'var(--trail)' : '#9DB3B1'} strokeWidth="3" />
+            {(i === 0 || got) && <path d={`M${p.x - 5} ${p.y} l3.5 3.5 l6.5 -7`} fill="none" stroke="#fff" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />}
             <text x={p.x + (right ? 20 : -20)} y={p.y - 2} textAnchor={right ? 'start' : 'end'} className="trail-name">{p.name}</text>
             <text x={p.x + (right ? 20 : -20)} y={p.y + 15} textAnchor={right ? 'start' : 'end'} className="trail-sub">{p.goal ? `${p.goal} indicadores` : 'Punto de partida'}</text>
           </g>

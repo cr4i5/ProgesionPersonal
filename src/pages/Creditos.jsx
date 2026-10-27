@@ -25,15 +25,15 @@ export default function Creditos() {
   }
   return (
     <div className="page" style={{ '--c': '#C98A00' }}>
-      <PageHead title="Créditos" sub={`Para completar Explorador necesitas mínimo ${CREDITS_MIN} créditos. Registra cada actividad que hiciste.`} />
+      <PageHead title="Créditos" sub={adult ? `Explorador exige mínimo ${CREDITS_MIN} créditos. Solo cuentan los que registra o aprueba un adulto.` : `Para completar Explorador necesitas mínimo ${CREDITS_MIN} créditos, registrados por tus adultos.`} />
       <div className="card credit-total">
         <strong>{stats.credits}<small> / {CREDITS_MIN}</small></strong>
         <div><Bar value={stats.credits} total={CREDITS_MIN} color="#C98A00" height={12} label="Créditos" />
           <span className="muted">{stats.credits >= CREDITS_MIN ? '¡Meta de créditos cumplida!' : `Te faltan ${CREDITS_MIN - stats.credits}`}</span></div>
       </div>
-      {!adult && (
+      {adult ? (
         <form className="card form" onSubmit={add}>
-          <h3>Agregar una actividad</h3>
+          <h3>Registrar una actividad a este joven</h3>
           <div className="row2">
             <label>Tipo de actividad
               <select value={cat} onChange={e => pick(e.target.value)}>{cats.map(c => <option key={c}>{c}</option>)}</select></label>
@@ -44,8 +44,10 @@ export default function Creditos() {
             <label>Fecha<input type="date" value={date} onChange={e => setDate(e.target.value)} /></label>
             <label>Nota (opcional)<input value={note} onChange={e => setNote(e.target.value)} placeholder="Dónde fue, con quién…" /></label>
           </div>
-          <button className="btn primary"><Plus size={17} /> Agregar · +{value} {value === 1 ? 'crédito' : 'créditos'}</button>
+          <button className="btn primary"><Plus size={17} /> Registrar · +{value} {value === 1 ? 'crédito' : 'créditos'}</button>
         </form>
+      ) : (
+        <div className="card note-card"><UserCheck size={20} /><span>Los créditos los registran tus adultos cuando participas en una actividad. Si hiciste algo que no aparece aquí, avísales.</span></div>
       )}
       <h2 className="h-section">{adult ? 'Actividades registradas' : 'Mis actividades'}</h2>
       {credits.length === 0 && <p className="empty">Aún no hay actividades registradas.</p>}

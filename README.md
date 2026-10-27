@@ -67,3 +67,14 @@ Sirve para ciclos institucionales, programas mundiales o actividades donde los j
 - **Ficha de un joven → cualquier indicador**: botón para marcarlo indicando «¿Por qué actividad?».
 - Lo marcado por adultos queda **aprobado** y con el nombre de la actividad. El joven lo ve en su inicio como «Tus adultos te marcaron logros».
 - Si el joven desmarca algo aprobado por un adulto, se le pide confirmación.
+
+## Actualización 5 — Los niveles solo cuentan lo aprobado por adultos
+
+**Orden para actualizar:** 1) ejecuta `supabase/migracion_5_niveles_aprobados.sql` en Supabase → SQL Editor (una sola vez); 2) sube el código nuevo a GitHub.
+
+Un nivel se alcanza únicamente cuando un adulto aprobó TODO esto (y los niveles van en orden):
+- **Explorador:** más de 80 indicadores aprobados, 6 campamentos, 12 excursiones y 16 créditos.
+- **Pionero:** más de 110 indicadores aprobados, 3 campamentos y 6 excursiones.
+- **Scout de Bolívar:** más de 135 indicadores aprobados, 4 campamentos y 8 excursiones.
+
+Lo que el joven marca por su cuenta espera revisión y no cuenta para el nivel. Los créditos los registran solo los adultos (el joven ya no puede agregarlos). El inicio muestra una tarjeta «Para ser …» con lo que falta.

@@ -9,6 +9,7 @@ import Fleur from '../components/Fleur.jsx'
 import AdminCard from '../components/AdminCard.jsx'
 import Badges from '../components/Badges.jsx'
 import NextStep from '../components/NextStep.jsx'
+import LevelReqs from '../components/LevelReqs.jsx'
 import { useAuth } from '../lib/auth.jsx'
 import { Flag, UserCheck } from 'lucide-react'
 import { INDEX } from '../lib/data.js'
@@ -18,7 +19,7 @@ export default function Home() {
   const { profile } = useAuth()
   const b = base || ''
   const first = (person?.full_name || '').split(' ')[0]
-  const next = LEVELS.find(l => stats.ind <= l.threshold)
+  const next = stats.next
   const lvl = stats.level
   return (
     <div className="page">
@@ -27,16 +28,16 @@ export default function Home() {
         <div className="hero-text">
           <h1>{adult ? `Progresión de ${first}` : `¡Hola, ${first}!`}</h1>
           <p className="lead">
-            {lvl ? <>{adult ? 'Completó' : 'Ya completaste'} el nivel <b>{lvl.name}</b>.</> : <>{adult ? 'Lleva' : 'Llevas'} <b>{stats.ind}</b> indicadores marcados.</>}{' '}
-            {next ? <>Para <b>{next.name}</b> {adult ? 'le' : 'te'} faltan <b>{next.threshold + 1 - stats.ind}</b>.</> : <>{adult ? 'Llegó a la cima.' : '¡Llegaste a la cima!'}</>}
+            {lvl ? <>{adult ? 'Completó' : 'Ya completaste'} el nivel <b>{lvl.name}</b>.</> : <>{adult ? 'Aún no completa ningún nivel.' : 'Aún no completas ningún nivel.'}</>}{' '}
+            {next ? <>Para <b>{next.name}</b> {adult ? 'le' : 'te'} falta: {next.req.filter(r => !r.ok).map(r => `${r.need - r.have} ${r.label.toLowerCase()}`).join(', ')}.</> : <>{adult ? 'Llegó a la cima.' : '¡Llegaste a la cima!'}</>}
           </p>
           <div className="hero-count">
-            <div><strong>{stats.ind}</strong><span>de {TOTAL_INDICATORS} indicadores</span></div>
             <div><strong>{stats.indOk}</strong><span>aprobados por adultos</span></div>
+            <div><strong>{stats.ind}</strong><span>marcados de {TOTAL_INDICATORS}</span></div>
           </div>
           {stats.pending > 0 && <p className="note-line">{stats.pending} {stats.pending === 1 ? 'logro espera' : 'logros esperan'} revisión.</p>}
         </div>
-        <Trail count={stats.ind} level={lvl} />
+        <Trail count={stats.indOk} level={lvl} reached={stats.reached} />
       </section>
 
       {!adult && profile && !profile.patrol && (
@@ -79,6 +80,7 @@ export default function Home() {
         </section>
       )}
 
+      <LevelReqs stats={stats} adult={adult} />
       {!adult && <NextStep items={items} stats={stats} base={b} />}
 
       <h2 className="h-section">Las seis áreas</h2>

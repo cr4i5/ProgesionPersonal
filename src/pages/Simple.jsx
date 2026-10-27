@@ -51,10 +51,10 @@ export function VidaGrupo() {
   const { items } = useProgress()
   const [lv, setLv] = useState('explorador')
   const L = LEVELS.find(l => l.id === lv)
-  const count = kind => Object.values(items).filter(r => r.item_key.startsWith(`vg:${lv}:${kind}:`) && r.status === 'completado').length
+  const count = kind => Object.values(items).filter(r => r.item_key.startsWith(`vg:${lv}:${kind}:`) && r.status === 'completado' && r.review_status === 'aprobado').length
   const group = (kind, label, total) => (
     <section className="card spec">
-      <h3>{label} <small>{count(kind)}/{total}</small></h3>
+      <h3>{label} <small>{count(kind)}/{total} aprobados</small></h3>
       <ul className="items flat">
         {Array.from({ length: total }, (_, i) => (
           <Item key={i} k={kVg(lv, kind, i + 1)} title={`${label.slice(0, -1)} ${i + 1}`} color="#1E9566" variant="tri"
@@ -65,7 +65,7 @@ export function VidaGrupo() {
   )
   return (
     <div className="page">
-      <PageHead title="Vida de grupo" sub="Registra los campamentos y excursiones de cada nivel." />
+      <PageHead title="Vida de grupo" sub="Marca tus campamentos y excursiones; cuentan para el nivel cuando un adulto los aprueba." />
       <div className="seg">
         {LEVELS.map(l => <button key={l.id} className={lv === l.id ? 'on' : ''} onClick={() => setLv(l.id)}>{l.name}</button>)}
       </div>

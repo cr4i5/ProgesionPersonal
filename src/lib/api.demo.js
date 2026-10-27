@@ -1,5 +1,6 @@
 // Modo demo: todo se guarda en el navegador (localStorage). Sirve para probar el diseño sin Supabase.
 import { AREAS, AVENTURERO, kInd, kAv, kEsp, kVg, LEVELS } from './data.js'
+import { levelProgress } from './stats.js'
 
 const LS = 'tropa-demo-v4'
 const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647 })()
@@ -103,7 +104,8 @@ export const db = {
         ind_done: done(r => r.item_key.startsWith('ind:')), ind_approved: done(r => r.item_key.startsWith('ind:') && r.review_status === 'aprobado'),
         av_done: done(r => r.item_key.startsWith('av:')), esp_done: done(r => r.item_key.startsWith('esp:')),
         camp_done: done(r => r.item_key.includes(':camp:')), exc_done: done(r => r.item_key.includes(':exc:')),
-        credits_total: cr.filter(c => c.review_status !== 'ajustes').reduce((a, c) => a + c.credits, 0),
+        credits_total: cr.filter(c => c.review_status === 'aprobado').reduce((a, c) => a + c.credits, 0),
+        level_id: levelProgress({ indOk: done(r => r.item_key.startsWith('ind:') && r.review_status === 'aprobado'), campsOk: Object.fromEntries(LEVELS.map(l => [l.id, done(r => r.review_status === 'aprobado' && r.item_key.startsWith(`vg:${l.id}:camp:`))])), excsOk: Object.fromEntries(LEVELS.map(l => [l.id, done(r => r.review_status === 'aprobado' && r.item_key.startsWith(`vg:${l.id}:exc:`))])), credOk: cr.filter(c => c.review_status === 'aprobado').reduce((a, c) => a + c.credits, 0) }).level?.id ?? null,
         pending: done(r => !r.item_key.startsWith('note:') && r.review_status === 'pendiente') + cr.filter(c => c.review_status === 'pendiente').length,
         last_activity: it.map(r => r.updated_at).sort().pop() || null,
         asv_registered: !!s.admin?.[u.id]?.asv_registered, asv_year: s.admin?.[u.id]?.asv_year ?? null, medical_form: !!s.admin?.[u.id]?.medical_form, medical_form_date: s.admin?.[u.id]?.medical_form_date ?? null }

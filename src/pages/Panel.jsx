@@ -5,10 +5,12 @@ import Fleur, { BrandLogo } from '../components/Fleur.jsx'
 import { db } from '../lib/api.js'
 import { useAuth } from '../lib/auth.jsx'
 import { LEVELS, TOTAL_INDICATORS } from '../lib/data.js'
-import { levelOfIndicators, ago } from '../lib/stats.js'
+import { ago } from '../lib/stats.js'
 import Bar from '../components/Bar.jsx'
 
 const isIdle = r => !r.last_activity || Date.now() - new Date(r.last_activity) > 30 * 864e5
+
+const lvlOf = r => LEVELS.find(l => l.id === r.level_id) || null
 
 export default function Panel() {
   const { signOut, profile } = useAuth()
@@ -31,7 +33,7 @@ export default function Panel() {
 
   function exportCsv() {
     const head = ['Nombre', 'Edad', 'Grupo', 'Patrulla', 'Indicadores marcados', 'Indicadores aprobados', 'Nivel', 'Aventurero (de 9)', 'Especialidades', 'Campamentos', 'Excursiones', 'Créditos', 'Pendientes de revisión', 'Última actividad', 'Inscrito ASV', 'Año inscripción', 'Ficha médica entregada']
-    const lines = (rows || []).map(r => [r.full_name, r.age ?? '', r.scout_group ?? '', r.patrol ?? '', r.ind_done, r.ind_approved, levelOfIndicators(r.ind_done)?.name || 'En camino', r.av_done, r.esp_done, r.camp_done, r.exc_done, r.credits_total, r.pending, r.last_activity?.slice(0, 10) ?? '', r.asv_registered ? 'Sí' : 'No', r.asv_year ?? '', r.medical_form ? 'Sí' : 'No'])
+    const lines = (rows || []).map(r => [r.full_name, r.age ?? '', r.scout_group ?? '', r.patrol ?? '', r.ind_done, r.ind_approved, lvlOf(r)?.name || 'En camino', r.av_done, r.esp_done, r.camp_done, r.exc_done, r.credits_total, r.pending, r.last_activity?.slice(0, 10) ?? '', r.asv_registered ? 'Sí' : 'No', r.asv_year ?? '', r.medical_form ? 'Sí' : 'No'])
     const csv = [head, ...lines].map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })); a.download = 'progresion-tropa.csv'; a.click()
   }
@@ -56,7 +58,7 @@ export default function Panel() {
             <div className="tiles small">
               <div className="tile static"><strong>{rows.length}</strong><span>Jóvenes registrados</span></div>
               <div className="tile static"><strong>{totalPending}</strong><span>Logros por revisar</span></div>
-              <div className="tile static"><strong>{rows.filter(r => levelOfIndicators(r.ind_done)).length}</strong><span>Con un nivel completado</span></div>
+              <div className="tile static"><strong>{rows.filter(r => lvlOf(r)).length}</strong><span>Con un nivel completado</span></div>
             </div>
             <div className="filters">
               <label className="search"><Search size={17} /><input placeholder="Buscar por nombre" value={q} onChange={e => setQ(e.target.value)} aria-label="Buscar por nombre" /></label>
@@ -72,7 +74,7 @@ export default function Panel() {
             {rows.length === 0 && <p className="empty">Todavía no se ha registrado ningún joven. Comparte el enlace de esta página con ellos.</p>}
             <ul className="scouts">
               {list.map(r => {
-                const lvl = levelOfIndicators(r.ind_done)
+                const lvl = lvlOf(r)
                 return (
                   <li key={r.user_id}>
                     <Link to={`/panel/${r.user_id}`} className="scout-row">
