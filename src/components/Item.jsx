@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, MessageSquare, Clock, ThumbsUp, RotateCcw, Send } from 'lucide-react'
+import { Check, MessageSquare, Clock, ThumbsUp, RotateCcw, Send, UserCheck, X } from 'lucide-react'
 import { useProgress } from '../lib/progress.jsx'
 
 const MSGS = ['¡Muy bien!', '¡Lo lograste!', '¡Un paso más en el camino!', '¡Así se hace!', '¡Excelente!']
@@ -9,6 +9,33 @@ export function ReviewTag({ row }) {
   if (row.review_status === 'aprobado') return <span className="tag ok"><ThumbsUp size={13} /> Aprobado</span>
   if (row.review_status === 'ajustes') return <span className="tag warn"><RotateCcw size={13} /> Para mejorar</span>
   return <span className="tag wait"><Clock size={13} /> En revisión</span>
+}
+
+export function MarkTag({ row, adult }) {
+  if (!row || row.status !== 'completado' || !row.marked_by) return null
+  return <span className="tag mark"><UserCheck size={13} /> {adult ? 'Marcado por un adulto' : 'Marcado por tu adulto'}{row.source ? ` · ${row.source}` : ''}</span>
+}
+
+const lastSource = () => { try { return localStorage.getItem('tropa-last-source') || '' } catch { return '' } }
+
+// El adulto marca el logro como cumplido (ej. por una actividad institucional)
+function AdultMark({ row, onMark }) {
+  const [open, setOpen] = useState(false)
+  const [src, setSrc] = useState(lastSource)
+  const done = row?.status === 'completado'
+  if (done && row.marked_by) return <button className="btn sm ghost" onClick={() => onMark('pendiente', '')}><X size={15} /> Quitar la marca del adulto</button>
+  if (done) return null
+  if (!open) return <button className="btn sm ghost" onClick={() => setOpen(true)}><UserCheck size={15} /> Marcar como cumplido</button>
+  return (
+    <div className="mark-form">
+      <label>¿Por qué actividad? (opcional)
+        <input value={src} maxLength={80} placeholder="Ej: CADIPAS 2026, Jamboree, Programa mundial…" onChange={e => setSrc(e.target.value)} autoFocus /></label>
+      <div className="review-actions">
+        <button className="btn sm primary" onClick={() => { try { localStorage.setItem('tropa-last-source', src) } catch { } onMark('completado', src); setOpen(false) }}><Check size={15} /> Confirmar</button>
+        <button className="btn sm ghost" onClick={() => setOpen(false)}>Cancelar</button>
+      </div>
+    </div>
+  )
 }
 
 // Caja de revisión para adultos (sirve para indicadores y para créditos)
@@ -65,7 +92,7 @@ const TRI = [['pendiente', 'Sin empezar'], ['en_proceso', 'En proceso'], ['compl
 
 /** variant: 'check' (indicador / meta) | 'tri' (sin empezar · en proceso · finalizado) */
 export default function Item({ k, tag, text, color = '#1F3F9A', variant = 'check', noteLabel = '¿Cómo lo lograste? (opcional)', notePlaceholder = 'Cuéntalo con tus palabras…', title }) {
-  const { items, save, review, adult, celebrate, toast } = useProgress()
+  const { items, save, review, adult, celebrate, toast, adultMark } = useProgress()
   const row = items[k]
   const status = row?.status || 'pendiente'
   const done = status === 'completado'
@@ -98,6 +125,7 @@ export default function Item({ k, tag, text, color = '#1F3F9A', variant = 'check
           {tag && <span className="letter">{tag}</span>}
           {text && <p>{text}</p>}
         </div>
+        <MarkTag row={row} adult={adult} />
         <ReviewTag row={row} />
       </div>
 
@@ -110,7 +138,8 @@ export default function Item({ k, tag, text, color = '#1F3F9A', variant = 'check
         <button className="link-btn" onClick={() => setShowNote(true)}><MessageSquare size={14} /> Añadir una nota</button>
       )}
       <Feedback row={row} />
-      {adult && done && <ReviewBox row={row} onReview={r => review(k, r)} />}
+      {adult && done && !row?.marked_by && <ReviewBox row={row} onReview={r => review(k, r)} />}
+      {adult && <AdultMark row={row} onMark={(st, src) => adultMark(k, st, src)} />}
     </li>
   )
 }

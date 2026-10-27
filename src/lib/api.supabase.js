@@ -50,5 +50,22 @@ export const db = {
     return data || {}
   },
   async saveAdmin(uid, patch) { must(await sb.from('member_admin').upsert({ user_id: uid, ...patch }, { onConflict: 'user_id' })) },
+  // --- el adulto marca por el joven ---
+  async adultSetItem(uid, k, { status, source }) {
+    if (status === 'completado') must(await sb.from('progress_items').upsert({ user_id: uid, item_key: k, status, source: source || null, review_status: 'aprobado' }, { onConflict: 'user_id,item_key' }))
+    else must(await sb.from('progress_items').update({ status }).eq('user_id', uid).eq('item_key', k))
+  },
+  async adultMarkMany(rows) {
+    for (let i = 0; i < rows.length; i += 300) must(await sb.from('progress_items').upsert(rows.slice(i, i + 300), { onConflict: 'user_id,item_key' }))
+  },
+  async adultAddCredits(rows) {
+    for (let i = 0; i < rows.length; i += 300) must(await sb.from('credit_entries').insert(rows.slice(i, i + 300)))
+  },
+  async listTemplates() {
+    const { data, error } = await sb.from('activity_templates').select('name,item_keys').order('name')
+    if (error) return null // aún no se corrió la migración 4
+    return data
+  },
+  async saveTemplate(name, item_keys) { must(await sb.from('activity_templates').upsert({ name, item_keys, updated_at: new Date().toISOString() }, { onConflict: 'name' })) },
   async summary() { return must(await sb.rpc('scout_summary')) },
 }

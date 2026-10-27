@@ -42,6 +42,14 @@ export function ProgressProvider({ userId, mode, base, children }) {
     catch { setItems(m => ({ ...m, [key]: prev })); fail() }
   }, [items, userId, fail, toast])
 
+  // El adulto marca (o quita la marca) por el joven. Queda aprobado y con el nombre de la actividad.
+  const adultMark = useCallback(async (key, status, source) => {
+    const prev = items[key]
+    setItems(m => ({ ...m, [key]: { user_id: userId, item_key: key, note: '', ...prev, status, marked_by: status === 'completado' ? 'adulto' : null, source: status === 'completado' ? (source || null) : null, review_status: status === 'completado' ? 'aprobado' : 'pendiente' } }))
+    try { await db.adultSetItem(userId, key, { status, source }); toast(status === 'completado' ? 'Marcado como cumplido' : 'Marca quitada') }
+    catch { setItems(m => { const c = { ...m }; if (prev) c[key] = prev; else delete c[key]; return c }); fail() }
+  }, [items, userId, fail, toast])
+
   const addCredit = useCallback(async e => {
     try { const row = await db.addCredit(userId, e); setCredits(c => [row, ...c]); return true } catch { fail(); return false }
   }, [userId, fail])
@@ -61,7 +69,7 @@ export function ProgressProvider({ userId, mode, base, children }) {
   }, [admin, userId, fail, toast])
 
   const stats = useMemo(() => summarize(items, credits), [items, credits])
-  const value = { userId, mode, base, adult: mode === 'adult', items, credits, person, stats, admin, saveAdmin, save, review, addCredit, deleteCredit, reviewCredit, celebrate, toast, state }
+  const value = { userId, mode, base, adult: mode === 'adult', items, credits, person, stats, admin, saveAdmin, adultMark, save, review, addCredit, deleteCredit, reviewCredit, celebrate, toast, state }
   if (state === 'loading') return <div className="center-screen"><div className="spinner" aria-label="Cargando" /></div>
   if (state === 'error') return <div className="center-screen"><p className="muted">No pudimos cargar los datos. Recarga la página.</p></div>
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

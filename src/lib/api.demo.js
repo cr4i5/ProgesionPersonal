@@ -1,7 +1,7 @@
 // Modo demo: todo se guarda en el navegador (localStorage). Sirve para probar el diseño sin Supabase.
 import { AREAS, AVENTURERO, kInd, kAv, kEsp, kVg, LEVELS } from './data.js'
 
-const LS = 'tropa-demo-v3'
+const LS = 'tropa-demo-v4'
 const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647 })()
 const uid = () => 'u' + Math.random().toString(36).slice(2, 10)
 
@@ -77,6 +77,23 @@ export const db = {
   async reviewCredit(id, { review_status, review_comment }) { Object.assign(S.credits.find(c => c.id === id), { review_status, review_comment: review_comment || null }); save() },
   async getAdmin(id) { return wait(load().admin?.[id] || {}) },
   async saveAdmin(id, patch) { const s = load(); s.admin = s.admin || {}; s.admin[id] = { ...(s.admin[id] || {}), ...patch }; save() },
+  async adultSetItem(id, k, { status, source }) {
+    const items = load().items[id]; const now = new Date().toISOString()
+    if (status === 'completado') items[k] = { ...(items[k] || {}), user_id: id, item_key: k, status, note: items[k]?.note || '', marked_by: 'adulto', source: source || null, review_status: 'aprobado', updated_at: now }
+    else if (items[k]) Object.assign(items[k], { status, marked_by: null, source: null, review_status: 'pendiente', updated_at: now })
+    save()
+  },
+  async adultMarkMany(rows) {
+    const s = load(); const now = new Date().toISOString()
+    rows.forEach(r => {
+      const items = s.items[r.user_id]; const old = items[r.item_key]
+      if (old?.status === 'completado') old.review_status = 'aprobado'
+      else items[r.item_key] = { ...(old || {}), user_id: r.user_id, item_key: r.item_key, status: 'completado', note: old?.note || '', marked_by: 'adulto', source: r.source || null, review_status: 'aprobado', updated_at: now }
+    }); save()
+  },
+  async adultAddCredits(rows) { const s = load(); rows.forEach(r => s.credits.unshift({ id: uid(), review_status: 'aprobado', review_comment: null, marked_by: 'adulto', created_at: new Date().toISOString(), ...r })); save() },
+  async listTemplates() { const s = load(); s.templates = s.templates || {}; return Object.entries(s.templates).map(([name, item_keys]) => ({ name, item_keys })) },
+  async saveTemplate(name, keys) { const s = load(); s.templates = s.templates || {}; s.templates[name] = keys; save() },
   async summary() {
     const s = load()
     return wait(s.users.filter(u => u.profile.role === 'scout').map(u => {

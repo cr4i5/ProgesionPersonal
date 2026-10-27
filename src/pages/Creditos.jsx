@@ -6,6 +6,7 @@ import { fmtDate } from '../lib/stats.js'
 import { PageHead } from './Areas.jsx'
 import Bar from '../components/Bar.jsx'
 import { ReviewBox, Feedback } from '../components/Item.jsx'
+import { UserCheck } from 'lucide-react'
 
 const TAGS = { aprobado: ['ok', 'Aprobado'], ajustes: ['warn', 'Para mejorar'], pendiente: ['wait', 'En revisión'] }
 
@@ -54,11 +55,12 @@ export default function Creditos() {
             <div className="item-main">
               <span className="credit-pill">+{c.credits}</span>
               <div className="item-body"><div className="item-title">{c.activity}</div><p className="muted">{c.category}{c.done_on ? ` · ${fmtDate(c.done_on)}` : ''}</p>{c.note && <p>{c.note}</p>}</div>
+              {c.marked_by && <span className="tag mark"><UserCheck size={13} /> Registrado por {adult ? 'un' : 'tu'} adulto</span>}
               <span className={`tag ${TAGS[c.review_status][0]}`}>{TAGS[c.review_status][1]}</span>
-              {!adult && c.review_status !== 'aprobado' && <button className="icon-btn" aria-label="Eliminar" onClick={() => deleteCredit(c.id)}><Trash2 size={18} /></button>}
+              {((!adult && c.review_status !== 'aprobado') || (adult && c.marked_by)) && <button className="icon-btn" aria-label="Eliminar" onClick={() => deleteCredit(c.id)}><Trash2 size={18} /></button>}
             </div>
             <Feedback row={{ ...c, status: 'completado' }} />
-            {adult && <ReviewBox row={c} onReview={r => reviewCredit(c.id, r)} />}
+            {adult && !c.marked_by && <ReviewBox row={c} onReview={r => reviewCredit(c.id, r)} />}
           </li>
         ))}
       </ul>

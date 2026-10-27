@@ -293,3 +293,30 @@ a.callout.notice:hover{border-color:var(--sun-d)}
   .item,.card,.area-card,.tile,.hero,.callout{box-shadow:none!important;break-inside:avoid;border:1px solid #ccc}
   .bar{border:1px solid #bbb}
 }
+
+.tag.mark{background:var(--lake-soft);color:var(--lake-d)}
+.mark-form{display:flex;flex-direction:column;gap:8px;border-top:2px dashed var(--line);padding-top:10px;font-weight:800;font-size:.92rem}
+.mark-form label{display:flex;flex-direction:column;gap:5px}
+.callout.info{background:var(--lake-soft)}.callout.info h2{color:var(--lake-d)}.callout.info p{margin-top:6px;color:var(--ink)}
+.item>.btn.sm{align-self:flex-start}
+
+/* ---------- registrar actividad ---------- */
+.step{gap:14px}.step h2{display:flex;align-items:center;gap:10px}.step h2 small{font:700 .9rem var(--body);color:var(--muted)}
+.step-n{width:30px;height:30px;border-radius:50%;background:var(--murrey);color:var(--sun);display:grid;place-items:center;font:800 1rem var(--head)}
+.pick-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px 14px;max-height:340px;overflow:auto}
+.pick-list li{padding:4px 2px}.pick-list label{align-items:flex-start}.pick-list small{display:block}
+.area-pick{display:flex;flex-direction:column;gap:8px}
+.area-pick details{border:2px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.area-pick details[open]{border-color:var(--c)}
+.area-pick summary{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;list-style:none}
+.area-pick summary::-webkit-details-marker{display:none}.area-pick summary .chev{margin-left:auto;transition:transform .2s}
+.area-pick details[open] summary .chev{transform:rotate(180deg)}.area-pick summary .tag{margin-left:6px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--c)}
+.stage-pick{padding:6px 14px 12px;border-top:2px solid var(--soft)}
+.stage-head{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
+.stage-pick ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.stage-pick li{padding:5px 4px;border-radius:8px}.stage-pick li:hover{background:var(--soft)}
+.stage-pick label{align-items:flex-start;font-size:.95rem}.stage-pick .letter{margin:0 4px 0 0}
+.action-bar{position:sticky;bottom:0;z-index:6;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#fff;border-top:2px solid var(--line);padding:12px clamp(16px,4vw,40px);box-shadow:0 -8px 24px -16px rgba(20,26,60,.4)}
+.action-bar>div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.done-card{align-items:center;text-align:center;gap:14px;padding:32px}.done-card svg{color:var(--ok)}

@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { NavLink, Link, Outlet } from 'react-router-dom'
-import { Printer, Home, Compass, Backpack, Medal, Tent, Award, NotebookPen, User, LogOut, Menu, X, ArrowLeft, ClipboardCheck } from 'lucide-react'
+import { Printer, Home, Compass, Backpack, Medal, Tent, Award, NotebookPen, User, LogOut, Menu, X, ArrowLeft, ClipboardCheck, CalendarCheck } from 'lucide-react'
 import Fleur, { BrandLogo } from './Fleur.jsx'
 import { useAuth } from '../lib/auth.jsx'
 import { useProgress } from '../lib/progress.jsx'
 
 export default function Shell() {
   const { signOut, profile } = useAuth()
-  const { adult, base, person, stats } = useProgress()
+  const { adult, base, person, stats, userId } = useProgress()
   const [open, setOpen] = useState(false)
   const p = base || ''
   const nav = [
@@ -20,6 +20,7 @@ export default function Shell() {
     [`${p}/cuaderno`, 'Cuaderno', NotebookPen],
   ]
   if (adult) nav.splice(1, 0, [`${p}/revisar`, 'Por revisar', ClipboardCheck])
+  if (adult) nav.push([`/panel/actividad?joven=${userId}`, 'Registrar actividad', CalendarCheck])
   else nav.push(['/perfil', 'Mi perfil', User])
   const close = () => setOpen(false)
   return (

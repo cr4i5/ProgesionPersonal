@@ -53,3 +53,17 @@ Corre **una vez** `supabase/migracion_3_patrulla.sql` en el SQL Editor **antes**
 - Panel de adultos: patrulla en cada joven, filtro por patrulla, filtro "sin actividad (30 días)" y columna Patrulla en el CSV.
 - Joven: insignias automáticas, sugerencia de "siguiente paso", filtro "solo los que me faltan" en cada área, confirmación al desmarcar algo ya aprobado, botón imprimir.
 - Instalable en el celular ("Agregar a pantalla de inicio") con ícono de flor de lis.
+
+## Actualización 4 — Los adultos pueden marcar indicadores a los jóvenes
+
+Sirve para ciclos institucionales, programas mundiales o actividades donde los jóvenes no saben qué indicadores cumplieron.
+
+**Orden para actualizar (importante):**
+1. En Supabase → SQL Editor, ejecuta una sola vez `supabase/migracion_4_marcar_adultos.sql`.
+2. Después sube el código nuevo a GitHub (Vercel despliega solo).
+
+**Cómo se usa**
+- **Panel → Registrar actividad**: eliges la actividad (y opcionalmente +1 crédito), los jóvenes (con filtro por patrulla) y los indicadores. Puedes guardar la selección como plantilla; las plantillas son compartidas entre adultos.
+- **Ficha de un joven → cualquier indicador**: botón para marcarlo indicando «¿Por qué actividad?».
+- Lo marcado por adultos queda **aprobado** y con el nombre de la actividad. El joven lo ve en su inicio como «Tus adultos te marcaron logros».
+- Si el joven desmarca algo aprobado por un adulto, se le pide confirmación.

@@ -10,7 +10,7 @@ import AdminCard from '../components/AdminCard.jsx'
 import Badges from '../components/Badges.jsx'
 import NextStep from '../components/NextStep.jsx'
 import { useAuth } from '../lib/auth.jsx'
-import { Flag } from 'lucide-react'
+import { Flag, UserCheck } from 'lucide-react'
 import { INDEX } from '../lib/data.js'
 
 export default function Home() {
@@ -44,6 +44,18 @@ export default function Home() {
           <Flag size={22} /><div><b>Cuéntanos a qué patrulla perteneces</b><span>Agrégalo en Mi perfil. Solo toma un momento.</span></div><ChevronRight size={20} />
         </Link>
       )}
+
+      {(() => {
+        const marked = Object.values(items).filter(r => r.marked_by && r.status === 'completado' && !r.item_key.startsWith('note:'))
+        if (!marked.length) return null
+        const by = {}; marked.forEach(r => { const k = r.source || 'una actividad'; by[k] = (by[k] || 0) + 1 })
+        return (
+          <section className="callout info">
+            <h2><UserCheck size={20} /> {adult ? 'Logros marcados por adultos' : 'Tus adultos te marcaron logros'}</h2>
+            <p>{Object.entries(by).map(([k, n]) => `${k} (${n})`).join(' · ')}</p>
+          </section>
+        )
+      })()}
 
       <AdminCard />
 

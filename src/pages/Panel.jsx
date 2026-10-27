@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Download, Clock, ChevronRight, LogOut } from 'lucide-react'
+import { Search, Download, Clock, ChevronRight, LogOut, CalendarCheck } from 'lucide-react'
 import Fleur, { BrandLogo } from '../components/Fleur.jsx'
 import { db } from '../lib/api.js'
 import { useAuth } from '../lib/auth.jsx'
@@ -42,6 +42,7 @@ export default function Panel() {
       <header className="panel-top">
         <span className="brand"><BrandLogo /> Mi Progresión · Adultos</span>
         <span className="grow" />
+        <Link to="/panel/actividad" className="btn sm primary"><CalendarCheck size={15} /> Registrar actividad</Link>
         <span className="who">{profile?.full_name}</span>
         <button className="link-btn" onClick={signOut}><LogOut size={15} /> Salir</button>
       </header>
