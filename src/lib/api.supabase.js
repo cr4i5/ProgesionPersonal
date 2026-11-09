@@ -67,5 +67,21 @@ export const db = {
     return data
   },
   async saveTemplate(name, item_keys) { must(await sb.from('activity_templates').upsert({ name, item_keys, updated_at: new Date().toISOString() }, { onConflict: 'name' })) },
+  // --- Adultos conectados y chat (migración 6). Si la migración no se corrió, devuelven vacío.
+  async heartbeat(uid, viewing) {
+    const { error } = await sb.from('adult_presence').upsert({ user_id: uid, viewing_user: viewing || null }, { onConflict: 'user_id' })
+    return !error
+  },
+  async leave(uid) { await sb.from('adult_presence').delete().eq('user_id', uid) },
+  async listPresence() {
+    const { data, error } = await sb.from('adult_presence').select('user_id,full_name,viewing_user,viewing_name')
+    return error ? null : data
+  },
+  async listMessages() {
+    const { data, error } = await sb.from('adult_messages').select('id,user_id,author_name,body,created_at').order('created_at', { ascending: false }).limit(150)
+    return error ? null : data.reverse()
+  },
+  async sendMessage(body) { must(await sb.from('adult_messages').insert({ body })) },
+  async deleteMessage(id) { must(await sb.from('adult_messages').delete().eq('id', id)) },
   async summary() { return must(await sb.rpc('scout_summary')) },
 }

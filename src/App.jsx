@@ -11,6 +11,8 @@ import Creditos from './pages/Creditos.jsx'
 import Revisar from './pages/Revisar.jsx'
 import Panel from './pages/Panel.jsx'
 import Actividad from './pages/Actividad.jsx'
+import Chat from './pages/Chat.jsx'
+import { TeamProvider } from './lib/team.jsx'
 
 function Setup() {
   return (
@@ -54,12 +56,15 @@ export default function App() {
   if (!user) return <Login />
   if (isAdult) {
     return (
-      <Routes>
-        <Route path="/panel" element={<Panel />} />
-        <Route path="/panel/actividad" element={<Actividad />} />
-        <Route path="/panel/:uid/*" element={<AdultScout />} />
-        <Route path="*" element={<Navigate to="/panel" replace />} />
-      </Routes>
+      <TeamProvider>
+        <Routes>
+          <Route path="/panel" element={<Panel />} />
+          <Route path="/panel/actividad" element={<Actividad />} />
+          <Route path="/panel/chat" element={<Chat />} />
+          <Route path="/panel/:uid/*" element={<AdultScout />} />
+          <Route path="*" element={<Navigate to="/panel" replace />} />
+        </Routes>
+      </TeamProvider>
     )
   }
   return (

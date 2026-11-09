@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Download, Clock, ChevronRight, LogOut, CalendarCheck } from 'lucide-react'
+import { Search, Download, Clock, ChevronRight, LogOut, CalendarCheck, MessagesSquare } from 'lucide-react'
 import Fleur, { BrandLogo } from '../components/Fleur.jsx'
 import { db } from '../lib/api.js'
 import { useAuth } from '../lib/auth.jsx'
 import { LEVELS, TOTAL_INDICATORS } from '../lib/data.js'
 import { ago } from '../lib/stats.js'
 import Bar from '../components/Bar.jsx'
+import { OnlineAdults } from '../components/LiveBar.jsx'
+import { useTeam } from '../lib/team.jsx'
 
 const isIdle = r => !r.last_activity || Date.now() - new Date(r.last_activity) > 30 * 864e5
 
@@ -14,6 +16,7 @@ const lvlOf = r => LEVELS.find(l => l.id === r.level_id) || null
 
 export default function Panel() {
   const { signOut, profile } = useAuth()
+  const team = useTeam()
   const [rows, setRows] = useState(null)
   const [err, setErr] = useState(false)
   const [q, setQ] = useState('')
@@ -44,6 +47,7 @@ export default function Panel() {
       <header className="panel-top">
         <span className="brand"><BrandLogo /> Mi Progresión · Adultos</span>
         <span className="grow" />
+        <Link to="/panel/chat" className="btn sm chat-btn"><MessagesSquare size={15} /> Chat{team?.unread > 0 && <em className="count">{team.unread}</em>}</Link>
         <Link to="/panel/actividad" className="btn sm primary"><CalendarCheck size={15} /> Registrar actividad</Link>
         <span className="who">{profile?.full_name}</span>
         <button className="link-btn" onClick={signOut}><LogOut size={15} /> Salir</button>
@@ -51,6 +55,7 @@ export default function Panel() {
       <div className="page">
         <h1>Panel de adultos de programa</h1>
         <p className="lead">Revisa lo que los jóvenes marcaron, apruébalo o pide ajustes con un comentario.</p>
+        <OnlineAdults />
         {err && <p className="callout warn">No se pudo cargar el resumen. Verifica que ejecutaste el archivo schema.sql y que tu cuenta es de adulto.</p>}
         {!rows && !err && <div className="center-screen short"><div className="spinner" /></div>}
         {rows && (

@@ -78,3 +78,10 @@ Un nivel se alcanza únicamente cuando un adulto aprobó TODO esto (y los nivele
 - **Scout de Bolívar:** más de 135 indicadores aprobados, 4 campamentos y 8 excursiones.
 
 Lo que el joven marca por su cuenta espera revisión y no cuenta para el nivel. Los créditos los registran solo los adultos (el joven ya no puede agregarlos). El inicio muestra una tarjeta «Para ser …» con lo que falta.
+
+## Actualización 6 — Adultos conectados y chat de adultos
+
+**Orden para actualizar:** 1) ejecuta `supabase/migracion_6_conectados_y_chat.sql` en Supabase → SQL Editor (una sola vez); 2) sube el código nuevo a GitHub.
+
+- **Conectados:** cada adulto con la página abierta avisa que está activo cada ~25 s (se considera conectado si se le vio hace menos de 90 s). El panel muestra «Adultos conectados» y a quién está viendo cada uno. Cuando un adulto abre el progreso de un joven, ese joven ve arriba «Profe X está revisando tu progreso ahora mismo», y los otros adultos que miran al mismo joven también lo ven. Un joven solo ve a los adultos que están viendo SU progreso, nunca a los demás.
+- **Chat de adultos:** botón «Chat» en el panel y en el menú de la ficha de un joven, con contador de mensajes sin leer. Solo los adultos pueden leerlo o escribir; cada quien puede borrar sus propios mensajes. Se actualiza solo cada pocos segundos (no hace falta activar nada extra en Supabase).

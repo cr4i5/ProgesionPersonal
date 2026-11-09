@@ -95,6 +95,29 @@ export const db = {
   async adultAddCredits(rows) { const s = load(); rows.forEach(r => s.credits.unshift({ id: uid(), review_status: 'aprobado', review_comment: null, marked_by: 'adulto', created_at: new Date().toISOString(), ...r })); save() },
   async listTemplates() { const s = load(); s.templates = s.templates || {}; return Object.entries(s.templates).map(([name, item_keys]) => ({ name, item_keys })) },
   async saveTemplate(name, keys) { const s = load(); s.templates = s.templates || {}; s.templates[name] = keys; save() },
+  // --- Adultos conectados y chat (demo: una adulta ficticia siempre "conectada")
+  async heartbeat(uid, viewing) { const s = load(); s.presence = s.presence || {}; s.presence[uid] = { viewing: viewing || null, at: Date.now() }; save(); return true },
+  async leave(uid) { const s = load(); if (s.presence) delete s.presence[uid]; save() },
+  async listPresence(me) {
+    const s = load(); const pr = s.presence || {}
+    const scouts = s.users.filter(u => u.profile.role === 'scout')
+    const fake = { user_id: 'demo-carla', full_name: 'Profe Carla (demo)', viewing_user: scouts[1]?.id || null, viewing_name: scouts[1]?.profile.full_name || null }
+    const mine = Object.entries(pr).filter(([id, v]) => Date.now() - v.at < 90000 && id !== 'demo-carla')
+      .map(([id, v]) => ({ user_id: id, full_name: userOf(id)?.profile.full_name, viewing_user: v.viewing, viewing_name: v.viewing ? userOf(v.viewing)?.profile.full_name : null }))
+    const all = [fake, ...mine]
+    const meUser = userOf(me)
+    return all.filter(r => meUser?.profile.role === 'adult' || r.viewing_user === me)
+  },
+  async listMessages() {
+    const s = load()
+    if (!s.messages) s.messages = [
+      { id: 'm1', user_id: 'demo-carla', author_name: 'Profe Carla (demo)', body: '¿Quién se encarga de revisar el Cuaderno de Valentina? Ya subió varios logros.', created_at: new Date(Date.now() - 36e5).toISOString() },
+      { id: 'm2', user_id: 'demo-carla', author_name: 'Profe Carla (demo)', body: 'Recuerden registrar CADIPAS con «Registrar actividad».', created_at: new Date(Date.now() - 18e5).toISOString() },
+    ]
+    return wait(structuredClone(s.messages))
+  },
+  async sendMessage(body, me) { const s = load(); await this.listMessages(); s.messages.push({ id: uid(), user_id: me, author_name: userOf(me)?.profile.full_name || '', body: body.trim(), created_at: new Date().toISOString() }); save() },
+  async deleteMessage(id) { const s = load(); s.messages = (s.messages || []).filter(m => m.id !== id); save() },
   async summary() {
     const s = load()
     return wait(s.users.filter(u => u.profile.role === 'scout').map(u => {

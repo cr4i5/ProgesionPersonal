@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { NavLink, Link, Outlet } from 'react-router-dom'
-import { Printer, Home, Compass, Backpack, Medal, Tent, Award, NotebookPen, User, LogOut, Menu, X, ArrowLeft, ClipboardCheck, CalendarCheck } from 'lucide-react'
+import { Printer, Home, Compass, Backpack, Medal, Tent, Award, NotebookPen, User, LogOut, Menu, X, ArrowLeft, ClipboardCheck, CalendarCheck, MessagesSquare } from 'lucide-react'
 import Fleur, { BrandLogo } from './Fleur.jsx'
 import { useAuth } from '../lib/auth.jsx'
 import { useProgress } from '../lib/progress.jsx'
+import { useTeam } from '../lib/team.jsx'
+import LiveBar from './LiveBar.jsx'
 
 export default function Shell() {
   const { signOut, profile } = useAuth()
   const { adult, base, person, stats, userId } = useProgress()
+  const team = useTeam()
   const [open, setOpen] = useState(false)
   const p = base || ''
   const nav = [
@@ -20,7 +23,7 @@ export default function Shell() {
     [`${p}/cuaderno`, 'Cuaderno', NotebookPen],
   ]
   if (adult) nav.splice(1, 0, [`${p}/revisar`, 'Por revisar', ClipboardCheck])
-  if (adult) nav.push([`/panel/actividad?joven=${userId}`, 'Registrar actividad', CalendarCheck])
+  if (adult) nav.push([`/panel/actividad?joven=${userId}`, 'Registrar actividad', CalendarCheck], ['/panel/chat', 'Chat de adultos', MessagesSquare])
   else nav.push(['/perfil', 'Mi perfil', User])
   const close = () => setOpen(false)
   return (
@@ -44,6 +47,7 @@ export default function Shell() {
             <NavLink key={to} to={to} end={end || false} onClick={close} className={({ isActive }) => (isActive ? 'on' : '')}>
               <Icon size={19} /> {label}
               {adult && label === 'Por revisar' && stats.pending > 0 && <em className="count">{stats.pending}</em>}
+              {adult && label === 'Chat de adultos' && team?.unread > 0 && <em className="count">{team.unread}</em>}
             </NavLink>
           ))}
         </nav>
@@ -55,7 +59,7 @@ export default function Shell() {
         </div>
       </aside>
       {open && <div className="scrim" onClick={close} />}
-      <main className="main"><Outlet /></main>
+      <main className="main"><LiveBar /><Outlet /></main>
     </div>
   )
 }
