@@ -85,3 +85,12 @@ Lo que el joven marca por su cuenta espera revisión y no cuenta para el nivel. 
 
 - **Conectados:** cada adulto con la página abierta avisa que está activo cada ~25 s (se considera conectado si se le vio hace menos de 90 s). El panel muestra «Adultos conectados» y a quién está viendo cada uno. Cuando un adulto abre el progreso de un joven, ese joven ve arriba «Profe X está revisando tu progreso ahora mismo», y los otros adultos que miran al mismo joven también lo ven. Un joven solo ve a los adultos que están viendo SU progreso, nunca a los demás.
 - **Chat de adultos:** botón «Chat» en el panel y en el menú de la ficha de un joven, con contador de mensajes sin leer. Solo los adultos pueden leerlo o escribir; cada quien puede borrar sus propios mensajes. Se actualiza solo cada pocos segundos (no hace falta activar nada extra en Supabase).
+
+## Actualización 7 — Patrullas administradas por adultos
+
+**Orden para actualizar:** 1) ejecuta `supabase/migracion_7_patrullas.sql` en Supabase → SQL Editor (una sola vez); 2) sube el código nuevo a GitHub.
+
+- La migración **unifica automáticamente** las patrullas que ya escribieron los jóvenes (Bufalo / Bufalos / Búfalos → una sola; Orca / Orcas → una sola). Se queda con la variante más usada; si empatan, la más larga. Los adultos pueden cambiarle el nombre después.
+- Los jóvenes **eligen su patrulla de una lista** al registrarse y en Mi perfil; ya no pueden escribir una nueva.
+- Los adultos administran la lista en **Panel → Patrullas**: agregar, editar (renombrar) o eliminar. Si renombras una patrulla con un nombre que equivale a otra, se **unifican**. Si eliminas una, sus jóvenes quedan «sin patrulla» y verán un aviso para elegir otra.
+- Las comparaciones ignoran mayúsculas, tildes, plurales simples y la palabra «Patrulla»: Orca, orcas y «Patrulla Órcas» son la misma.

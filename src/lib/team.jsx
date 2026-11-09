@@ -16,7 +16,7 @@ export function TeamProvider({ children }) {
   const me = user.id
   const { pathname } = useLocation()
   const m = pathname.match(/^\/panel\/([^/]+)/)
-  const viewing = m && !['actividad', 'chat'].includes(m[1]) ? m[1] : null
+  const viewing = m && !['actividad', 'chat', 'patrullas'].includes(m[1]) ? m[1] : null
   const onChat = pathname === '/panel/chat'
   const [presence, setPresence] = useState([])
   const [messages, setMessages] = useState(null) // null = chat no disponible (falta migración 6)

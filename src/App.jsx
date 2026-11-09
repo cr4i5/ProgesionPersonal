@@ -12,6 +12,7 @@ import Revisar from './pages/Revisar.jsx'
 import Panel from './pages/Panel.jsx'
 import Actividad from './pages/Actividad.jsx'
 import Chat from './pages/Chat.jsx'
+import Patrullas from './pages/Patrullas.jsx'
 import { TeamProvider } from './lib/team.jsx'
 
 function Setup() {
@@ -61,6 +62,7 @@ export default function App() {
           <Route path="/panel" element={<Panel />} />
           <Route path="/panel/actividad" element={<Actividad />} />
           <Route path="/panel/chat" element={<Chat />} />
+          <Route path="/panel/patrullas" element={<Patrullas />} />
           <Route path="/panel/:uid/*" element={<AdultScout />} />
           <Route path="*" element={<Navigate to="/panel" replace />} />
         </Routes>

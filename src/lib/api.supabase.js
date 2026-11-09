@@ -67,6 +67,14 @@ export const db = {
     return data
   },
   async saveTemplate(name, item_keys) { must(await sb.from('activity_templates').upsert({ name, item_keys, updated_at: new Date().toISOString() }, { onConflict: 'name' })) },
+  // --- Patrullas (migración 7). Si no se corrió, listPatrols devuelve null y la web usa texto libre.
+  async listPatrols() {
+    const { data, error } = await sb.from('patrols').select('id,name').order('name')
+    return error ? null : data
+  },
+  async addPatrol(name) { must(await sb.rpc('patrol_add', { p_name: name })) },
+  async renamePatrol(id, name) { return must(await sb.rpc('patrol_rename', { p_id: id, p_name: name })) },
+  async deletePatrol(id) { return must(await sb.rpc('patrol_delete', { p_id: id })) },
   // --- Adultos conectados y chat (migración 6). Si la migración no se corrió, devuelven vacío.
   async heartbeat(uid, viewing) {
     const { error } = await sb.from('adult_presence').upsert({ user_id: uid, viewing_user: viewing || null }, { onConflict: 'user_id' })

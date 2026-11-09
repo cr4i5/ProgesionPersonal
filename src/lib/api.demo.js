@@ -1,6 +1,7 @@
 // Modo demo: todo se guarda en el navegador (localStorage). Sirve para probar el diseño sin Supabase.
 import { AREAS, AVENTURERO, kInd, kAv, kEsp, kVg, LEVELS } from './data.js'
 import { levelProgress } from './stats.js'
+import { patrolKey, cleanPatrolName } from './patrols.js'
 
 const LS = 'tropa-demo-v4'
 const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647 })()
@@ -38,6 +39,7 @@ function seed() {
   return st
 }
 let S
+function patrolsOf() { const s = load(); if (!s.patrols) { s.patrols = [...new Set(s.users.map(u => u.profile.patrol).filter(Boolean))].map(name => ({ id: uid(), name })); save() } return s.patrols }
 function load() { if (S) return S; try { S = JSON.parse(localStorage.getItem(LS)) } catch { } if (!S) { S = seed(); save() } return S }
 function save() { try { localStorage.setItem(LS, JSON.stringify(S)) } catch { } }
 const wait = v => new Promise(r => setTimeout(() => r(v), 60))
@@ -54,7 +56,7 @@ export const auth = {
   async signUp({ email, password, adult_code, ...meta }) {
     const s = load(); if (s.users.some(u => u.email === email.toLowerCase())) throw new Error('User already registered')
     if (adult_code && adult_code !== 'DEMO') throw new Error('Database error saving new user')
-    const id = uid(); s.users.push({ id, email: email.toLowerCase(), profile: { id, full_name: meta.full_name, age: meta.age ? +meta.age : null, join_troop: meta.join_troop || null, join_current: meta.join_current || null, scout_group: meta.scout_group || null, patrol: meta.patrol || null, role: adult_code ? 'adult' : 'scout', created_at: new Date().toISOString() } })
+    const id = uid(); s.users.push({ id, email: email.toLowerCase(), profile: { id, full_name: meta.full_name, age: meta.age ? +meta.age : null, join_troop: meta.join_troop || null, join_current: meta.join_current || null, scout_group: meta.scout_group || null, patrol: (patrolsOf().find(p => patrolKey(p.name) === patrolKey(meta.patrol)) || {}).name || null, role: adult_code ? 'adult' : 'scout', created_at: new Date().toISOString() } })
     s.items[id] = {}; s.session = id; save(); listener({ id, email }); return {}
   },
   async signOut() { S.session = null; save(); listener(null) },
@@ -63,7 +65,30 @@ export const auth = {
 
 export const db = {
   async getProfile(id) { return wait(userOf(id)?.profile ?? null) },
-  async updateProfile(id, patch) { Object.assign(userOf(id).profile, patch, { role: userOf(id).profile.role }); save() },
+  async updateProfile(id, patch) {
+    if ('patrol' in patch && patch.patrol) { const m = patrolsOf().find(p => patrolKey(p.name) === patrolKey(patch.patrol)); if (!m) throw new Error('Elige una patrulla de la lista'); patch = { ...patch, patrol: m.name } }
+    Object.assign(userOf(id).profile, patch, { role: userOf(id).profile.role }); save()
+  },
+  async listPatrols() { return wait(structuredClone(patrolsOf())) },
+  async addPatrol(name) {
+    const n = cleanPatrolName(name), k = patrolKey(n); if (!k) throw new Error('Escribe un nombre')
+    const ex = patrolsOf().find(p => patrolKey(p.name) === k); if (ex) throw new Error('Ya existe una patrulla parecida: ' + ex.name)
+    S.patrols.push({ id: uid(), name: n }); save()
+  },
+  async renamePatrol(id, name) {
+    const n = cleanPatrolName(name), k = patrolKey(n); if (!k) throw new Error('Escribe un nombre')
+    const old = patrolsOf().find(p => p.id === id); if (!old) throw new Error('La patrulla ya no existe')
+    const other = S.patrols.find(p => p.id !== id && patrolKey(p.name) === k)
+    const to = other ? other.name : n
+    S.users.forEach(u => { if (u.profile.role === 'scout' && patrolKey(u.profile.patrol) === patrolKey(old.name)) u.profile.patrol = to })
+    if (other) S.patrols = S.patrols.filter(p => p.id !== id); else old.name = n
+    save(); return to
+  },
+  async deletePatrol(id) {
+    const old = patrolsOf().find(p => p.id === id); if (!old) return 0; let n = 0
+    S.users.forEach(u => { if (u.profile.role === 'scout' && patrolKey(u.profile.patrol) === patrolKey(old.name)) { u.profile.patrol = null; n++ } })
+    S.patrols = S.patrols.filter(p => p.id !== id); save(); return n
+  },
   async listItems(id) { return wait(structuredClone(load().items[id] || {})) },
   async saveItem(id, k, { status, note }) {
     const items = load().items[id]; const old = items[k]

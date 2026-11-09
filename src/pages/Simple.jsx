@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { db } from '../lib/api.js'
 import { useProgress } from '../lib/progress.jsx'
 import { useAuth } from '../lib/auth.jsx'
 import { useUI } from '../lib/ui.jsx'
@@ -57,7 +58,7 @@ export function VidaGrupo() {
       <h3>{label} <small>{count(kind)}/{total} aprobados</small></h3>
       <ul className="items flat">
         {Array.from({ length: total }, (_, i) => (
-          <Item key={i} k={kVg(lv, kind, i + 1)} title={`${label.slice(0, -1)} ${i + 1}`} color="#1E9566" variant="tri"
+          <Item key={i} k={kVg(lv, kind, i + 1)} title={`${kind === 'camp' ? 'Campamento' : 'Excursión'} ${i + 1}`} color="#1E9566" variant="tri"
             noteLabel="¿Dónde y cuándo fue?" notePlaceholder="Ej: Campamento de otoño, 12 de octubre" />
         ))}
       </ul>
@@ -106,6 +107,8 @@ export function Perfil() {
   const { toast } = useUI()
   const [f, setF] = useState({ full_name: profile.full_name || '', age: profile.age ?? '', join_troop: profile.join_troop || '', join_current: profile.join_current || '', scout_group: profile.scout_group || '', patrol: profile.patrol || '' })
   const [busy, setBusy] = useState(false)
+  const [patrols, setPatrols] = useState(null)
+  useEffect(() => { db.listPatrols().then(setPatrols).catch(() => setPatrols(null)) }, [])
   const set = k => e => setF({ ...f, [k]: e.target.value })
   async function submit(e) {
     e.preventDefault(); setBusy(true)
@@ -121,8 +124,11 @@ export function Perfil() {
           <label>Edad<input type="number" min="5" max="99" value={f.age} onChange={set('age')} /></label>
           <label>Grupo scout<input value={f.scout_group} onChange={set('scout_group')} /></label>
         </div>
-        <label>Mi patrulla<input required maxLength={40} value={f.patrol} onChange={set('patrol')} placeholder="Ej: Águilas, Lobos, Halcones…" autoComplete="off" />
-          <span className="hint">Si cambias de patrulla, actualízalo aquí.</span></label>
+        <label>Mi patrulla
+          {patrols && patrols.length > 0
+            ? <select required value={f.patrol} onChange={set('patrol')}><option value="">Elige tu patrulla…</option>{patrols.map(p => <option key={p.id}>{p.name}</option>)}</select>
+            : <input maxLength={40} value={f.patrol} onChange={set('patrol')} placeholder="Ej: Águilas, Lobos, Halcones…" autoComplete="off" />}
+          <span className="hint">{patrols && patrols.length === 0 ? 'Tus adultos aún no han creado las patrullas.' : 'Si cambias de patrulla, actualízalo aquí.'}</span></label>
         <div className="row2">
           <label>Fecha de ingreso (Tropa)<input type="date" value={f.join_troop} onChange={set('join_troop')} /></label>
           <label>Fecha de ingreso (Tropa actual)<input type="date" value={f.join_current} onChange={set('join_current')} /></label>

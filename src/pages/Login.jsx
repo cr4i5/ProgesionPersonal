@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Fleur, { BrandLogo } from '../components/Fleur.jsx'
 import { useAuth } from '../lib/auth.jsx'
-import { DEMO } from '../lib/api.js'
+import { DEMO, db } from '../lib/api.js'
 
 const ERR = (m = '', adultTry) => {
   if (/Invalid login/i.test(m)) return 'Correo o contraseña incorrectos.'
@@ -20,6 +20,8 @@ export default function Login() {
   const [tab, setTab] = useState('in')
   const [f, setF] = useState({ email: '', password: '', full_name: '', age: '', scout_group: '', patrol: '', join_troop: '', join_current: '', adult_code: '' })
   const [adult, setAdult] = useState(false)
+  const [patrols, setPatrols] = useState(null) // null = cargando o sin migración
+  useEffect(() => { db.listPatrols().then(setPatrols).catch(() => setPatrols(null)) }, [])
   const [show, setShow] = useState(false)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState(null)
@@ -71,7 +73,10 @@ export default function Login() {
               <label>Edad<input required type="number" min="8" max="18" value={f.age} onChange={set('age')} /></label>
               <label>Grupo scout<input value={f.scout_group} onChange={set('scout_group')} /></label>
             </div>}
-            {!adult && <label>Patrulla<input required maxLength={40} value={f.patrol} onChange={set('patrol')} placeholder="Ej: Águilas, Lobos, Halcones…" autoComplete="off" /></label>}
+            {!adult && (patrols && patrols.length > 0
+              ? <label>Patrulla<select required value={f.patrol} onChange={set('patrol')}><option value="">Elige tu patrulla…</option>{patrols.map(p => <option key={p.id}>{p.name}</option>)}</select></label>
+              : patrols === null ? <label>Patrulla<input required maxLength={40} value={f.patrol} onChange={set('patrol')} placeholder="Ej: Águilas, Lobos, Halcones…" autoComplete="off" /></label>
+              : <p className="hint">Tus adultos aún no han creado las patrullas. Podrás elegir la tuya después, en Mi perfil.</p>)}
             {adult && <><label>Grupo scout<input value={f.scout_group} onChange={set('scout_group')} /></label>
               <label>Código de adulto<input required value={f.adult_code} onChange={set('adult_code')} autoComplete="off" /></label></>}
             {!adult && <div className="row2">

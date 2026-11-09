@@ -49,11 +49,17 @@ export default function Home() {
       {(() => {
         const marked = Object.values(items).filter(r => r.marked_by && r.status === 'completado' && !r.item_key.startsWith('note:'))
         if (!marked.length) return null
-        const by = {}; marked.forEach(r => { const k = r.source || 'una actividad'; by[k] = (by[k] || 0) + 1 })
+        const by = {}; marked.forEach(r => { const k = r.source || ''; by[k] = (by[k] || 0) + 1 })
+        const rows = Object.entries(by).sort((x, y) => y[1] - x[1])
         return (
-          <section className="callout info">
+          <section className="callout info marked-box">
             <h2><UserCheck size={20} /> {adult ? 'Logros marcados por adultos' : 'Tus adultos te marcaron logros'}</h2>
-            <p>{Object.entries(by).map(([k, n]) => `${k} (${n})`).join(' · ')}</p>
+            <p className="muted">{adult ? 'Indicadores que un adulto marcó como cumplidos (ya aprobados), por actividad.' : 'Estos logros ya están aprobados: no tienes que marcarlos tú.'}</p>
+            <ul>
+              {rows.map(([k, n]) => (
+                <li key={k}><span>{k || 'Sin actividad indicada'}</span><b>{n} {n === 1 ? 'logro' : 'logros'}</b></li>
+              ))}
+            </ul>
           </section>
         )
       })()}
