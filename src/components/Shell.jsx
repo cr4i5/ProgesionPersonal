@@ -1,17 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, Link, Outlet } from 'react-router-dom'
-import { Printer, Home, Compass, Backpack, Medal, Tent, Award, NotebookPen, User, LogOut, Menu, X, ArrowLeft, ClipboardCheck, CalendarCheck, MessagesSquare } from 'lucide-react'
+import { Printer, Home, Compass, Backpack, Medal, Tent, Award, NotebookPen, User, LogOut, Menu, X, ArrowLeft, ClipboardCheck, CalendarCheck, MessagesSquare, FileText, ShieldCheck } from 'lucide-react'
 import Fleur, { BrandLogo } from './Fleur.jsx'
 import { useAuth } from '../lib/auth.jsx'
 import { useProgress } from '../lib/progress.jsx'
 import { useTeam } from '../lib/team.jsx'
 import LiveBar from './LiveBar.jsx'
+import { db } from '../lib/api.js'
 
 export default function Shell() {
   const { signOut, profile } = useAuth()
   const { adult, base, person, stats, userId } = useProgress()
   const team = useTeam()
   const [open, setOpen] = useState(false)
+  const [isGuide, setIsGuide] = useState(false)
+  useEffect(() => { if (adult) setIsGuide(true); else db.isGuide().then(setIsGuide).catch(() => setIsGuide(false)) }, [adult, profile?.id])
   const p = base || ''
   const nav = [
     [`${p}/`, 'Inicio', Home, true],
@@ -23,8 +26,8 @@ export default function Shell() {
     [`${p}/cuaderno`, 'Cuaderno', NotebookPen],
   ]
   if (adult) nav.splice(1, 0, [`${p}/revisar`, 'Por revisar', ClipboardCheck])
-  if (adult) nav.push([`/panel/actividad?joven=${userId}`, 'Registrar actividad', CalendarCheck], ['/panel/chat', 'Chat de adultos', MessagesSquare])
-  else nav.push(['/perfil', 'Mi perfil', User])
+  if (adult) nav.push([`${p}/documentos`, 'Ficha médica', FileText], [`/panel/actividad?joven=${userId}`, 'Registrar actividad', CalendarCheck], ['/panel/chat', 'Chat de adultos', MessagesSquare], ['/panel/guias-chat', 'Chat de Guías', ShieldCheck])
+  else nav.push([`${p}/documentos`, 'Mis documentos', FileText], ...(isGuide ? [['/guias/chat', 'Espacio de Guías', ShieldCheck]] : []), ['/perfil', 'Mi perfil', User])
   const close = () => setOpen(false)
   return (
     <div className={`shell ${adult ? 'adult-view' : ''}`}>
@@ -52,7 +55,7 @@ export default function Shell() {
           ))}
         </nav>
         <div className="side-foot">
-          {!adult && <span className="who">{profile?.full_name}</span>}
+          {!adult && <span className="who">{profile?.full_name}{isGuide && <em className="guide-badge">Guía</em>}</span>}
           {adult && <Link to="/panel" className="who" onClick={close}>Panel de adultos</Link>}
           <button className="link-btn" onClick={() => window.print()}><Printer size={15} /> Imprimir esta página</button>
           <button className="link-btn" onClick={signOut}><LogOut size={15} /> Salir</button>

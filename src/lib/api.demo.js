@@ -143,6 +143,16 @@ export const db = {
   },
   async sendMessage(body, me) { const s = load(); await this.listMessages(); s.messages.push({ id: uid(), user_id: me, author_name: userOf(me)?.profile.full_name || '', body: body.trim(), created_at: new Date().toISOString() }); save() },
   async deleteMessage(id) { const s = load(); s.messages = (s.messages || []).filter(m => m.id !== id); save() },
+  async isGuide() { const s = load(); return Boolean(s.guides?.includes(s.session)) },
+  async listGuideCandidates() { return wait(load().users.filter(u => u.profile.role === 'scout').map(u => ({ id: u.id, full_name: u.profile.full_name, patrol: u.profile.patrol, scout_group: u.profile.scout_group }))) },
+  async listGuideMembers() { return wait((load().guides || []).map(user_id => ({ user_id }))) },
+  async setScoutGuide(userId, enabled) { const s = load(); s.guides ||= []; s.guides = enabled ? [...new Set([...s.guides, userId])] : s.guides.filter(x => x !== userId); save() },
+  async listGuideMessages() { return wait(load().guideMessages || []) },
+  async sendGuideMessage(body) { const s = load(); s.guideMessages ||= []; s.guideMessages.push({ id: uid(), user_id: s.session, author_name: userOf(s.session)?.profile.full_name || 'Demo', body, created_at: new Date().toISOString() }); save() },
+  async deleteGuideMessage(id) { const s = load(); s.guideMessages = (s.guideMessages || []).filter(m => m.id !== id); save() },
+  async listMedicalDocuments() { return wait([]) },
+  async uploadMedicalDocument() { throw new Error('La carga de documentos solo está disponible con Supabase conectado.') },
+  async deleteMedicalDocument() { throw new Error('La gestión de documentos solo está disponible con Supabase conectado.') },
   async summary() {
     const s = load()
     return wait(s.users.filter(u => u.profile.role === 'scout').map(u => {

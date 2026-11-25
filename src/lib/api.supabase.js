@@ -91,5 +91,30 @@ export const db = {
   },
   async sendMessage(body) { must(await sb.from('adult_messages').insert({ body })) },
   async deleteMessage(id) { must(await sb.from('adult_messages').delete().eq('id', id)) },
+  async isGuide() { return must(await sb.rpc('is_guide')) },
+  async listGuideCandidates() { return must(await sb.from('profiles').select('id,full_name,patrol,scout_group').eq('role', 'scout').order('full_name')) },
+  async listGuideMembers() { return must(await sb.from('guide_members').select('user_id')) },
+  async setScoutGuide(userId, enabled) { must(await sb.rpc('set_scout_guide', { p_user_id: userId, p_enabled: enabled })) },
+  async listGuideMessages() { return must(await sb.from('guide_messages').select('id,user_id,author_name,body,created_at').order('created_at', { ascending: false }).limit(250)).reverse() },
+  async sendGuideMessage(body) { must(await sb.from('guide_messages').insert({ body })) },
+  async deleteGuideMessage(id) { must(await sb.from('guide_messages').delete().eq('id', id)) },
+  async listMedicalDocuments(userId) {
+    const rows = must(await sb.from('medical_documents').select('id,user_id,file_name,storage_path,created_at').eq('user_id', userId).order('created_at', { ascending: false }))
+    return Promise.all(rows.map(async row => {
+      const signed = must(await sb.storage.from('medical-records').createSignedUrl(row.storage_path, 300))
+      return { ...row, url: signed.signedUrl }
+    }))
+  },
+  async uploadMedicalDocument(userId, file) {
+    const safe = file.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-100) || 'ficha.pdf'
+    const path = `${userId}/${crypto.randomUUID()}-${safe}`
+    must(await sb.storage.from('medical-records').upload(path, file, { contentType: 'application/pdf', upsert: false }))
+    const { error } = await sb.from('medical_documents').insert({ user_id: userId, uploaded_by: (await sb.auth.getUser()).data.user.id, file_name: file.name, storage_path: path })
+    if (error) { await sb.storage.from('medical-records').remove([path]); throw error }
+  },
+  async deleteMedicalDocument(doc) {
+    must(await sb.from('medical_documents').delete().eq('id', doc.id))
+    must(await sb.storage.from('medical-records').remove([doc.storage_path]))
+  },
   async summary() { return must(await sb.rpc('scout_summary')) },
 }

@@ -1,12 +1,14 @@
 :root{
-  /* Paleta inspirada en el emblema de los Scouts de Venezuela: vino (murrey) + amarillo, azul y rojo */
-  --ink:#141A3C; --muted:#545B7A; --murrey:#7B1E3A; --murrey-d:#4A0F23;
-  --lake:#1F3F9A; --lake-d:#14296B; --lake-soft:#E2E8F7;
-  --trail:#D4162B; --sun:#FFC20E; --sun-d:#C99700; --paper:#EEF0F6; --card:#fff; --line:#D6DAE8;
+  /* Identidad Tropa: verde bosque + amarillo aventura. */
+  --ink:#183326; --muted:#5C7064; --murrey:#246342; --murrey-d:#17452D;
+  --lake:#347A52; --lake-d:#205A3A; --lake-soft:#E2F0E6;
+  --trail:#347A52; --sun:#F4C542; --sun-d:#C79A20; --paper:#F1F6F1; --card:#fff; --line:#D6E3D9;
   --ok:#237A4B; --ok-soft:#DDF2E5; --warn:#B85A00; --warn-soft:#FDEBD6; --wait:#6B5400; --wait-soft:#FFF1BD;
   --r:18px; --shadow:0 1px 0 rgba(20,26,60,.05),0 6px 20px -10px rgba(20,26,60,.28);
   --head:'Bricolage Grotesque',system-ui,sans-serif; --body:'Nunito',system-ui,sans-serif;
 }
+/* Se reserva morado para pantallas y comunicaciones generales de la Asociación. */
+.association-theme{--murrey:#68408A;--murrey-d:#45285F;--lake:#8057A4;--lake-d:#573477;--lake-soft:#EFE7F6;--paper:#F6F1F8;--line:#E2D7EA}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;font:600 16.5px/1.5 var(--body);color:var(--ink);background:var(--paper)}
@@ -381,3 +383,14 @@ main>.live-bar{width:min(100% - 2*clamp(16px,4vw,40px),900px);margin:16px auto -
 .patrol-list li.card{display:flex!important;flex-direction:row!important;align-items:center!important;text-align:left!important;gap:12px}
 .patrol-name{text-align:left} .patrol-add.card.form{display:flex!important;flex-direction:row!important;align-items:flex-end!important;gap:12px}
 @media(max-width:560px){.patrol-add.card.form{flex-direction:column!important;align-items:stretch!important}}
+
+/* Módulos añadidos: Guías y documentos privados */
+.medical-private{display:flex;gap:10px;align-items:flex-start;background:#E7F2E9;color:#245A3A;font-weight:700}
+.medical-private svg{flex:none}
+.document-list{display:grid;gap:14px}
+.document-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.document-meta{display:grid;flex:1;min-width:0}.document-meta b{overflow-wrap:anywhere}.document-meta small,.guide-info small{color:var(--muted)}
+.guide-grid{display:grid;gap:10px}.guide-row{display:flex;align-items:center;gap:14px}.guide-avatar{width:44px;height:44px;border-radius:15px;background:var(--lake-soft);color:var(--murrey);display:grid;place-items:center;font-weight:900;flex:none}.guide-info{display:grid;flex:1;min-width:0}.guide-status{font-size:.78rem;color:var(--muted);font-weight:800}.guide-status.active{color:#237A4B}.guide-row .btn{white-space:nowrap}
+@media(max-width:560px){.guide-row{flex-wrap:wrap}.guide-row .btn{margin-left:58px}.document-row{flex-wrap:wrap}.document-meta{min-width:calc(100% - 50px)}}
+
+.guide-badge{display:inline-flex;margin-left:8px;padding:2px 9px;border-radius:999px;background:#F8E7A8;color:#604B10;font-size:.72rem;font-style:normal;font-weight:900;vertical-align:middle}

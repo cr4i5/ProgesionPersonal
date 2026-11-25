@@ -13,6 +13,9 @@ import Panel from './pages/Panel.jsx'
 import Actividad from './pages/Actividad.jsx'
 import Chat from './pages/Chat.jsx'
 import Patrullas from './pages/Patrullas.jsx'
+import GuideChat from './pages/GuideChat.jsx'
+import Guias from './pages/Guias.jsx'
+import Documentos from './pages/Documentos.jsx'
 import { TeamProvider } from './lib/team.jsx'
 
 function Setup() {
@@ -36,6 +39,8 @@ const pages = (adult) => (
     <Route path="creditos" element={<Creditos />} />
     <Route path="cuaderno" element={<Cuaderno />} />
     {adult ? <Route path="revisar" element={<Revisar />} /> : <Route path="perfil" element={<Perfil />} />}
+    <Route path="documentos" element={<Documentos />} />
+    {!adult && <Route path="guias/chat" element={<GuideChat />} />}
     <Route path="*" element={<Navigate to="." replace />} />
   </Route>
 )
@@ -62,6 +67,8 @@ export default function App() {
           <Route path="/panel" element={<Panel />} />
           <Route path="/panel/actividad" element={<Actividad />} />
           <Route path="/panel/chat" element={<Chat />} />
+          <Route path="/panel/guias" element={<Guias />} />
+          <Route path="/panel/guias-chat" element={<GuideChat adult />} />
           <Route path="/panel/patrullas" element={<Patrullas />} />
           <Route path="/panel/:uid/*" element={<AdultScout />} />
           <Route path="*" element={<Navigate to="/panel" replace />} />

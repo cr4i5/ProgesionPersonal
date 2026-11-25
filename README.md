@@ -94,3 +94,24 @@ Lo que el joven marca por su cuenta espera revisión y no cuenta para el nivel. 
 - Los jóvenes **eligen su patrulla de una lista** al registrarse y en Mi perfil; ya no pueden escribir una nueva.
 - Los adultos administran la lista en **Panel → Patrullas**: agregar, editar (renombrar) o eliminar. Si renombras una patrulla con un nombre que equivale a otra, se **unifican**. Si eliminas una, sus jóvenes quedan «sin patrulla» y verán un aviso para elegir otra.
 - Las comparaciones ignoran mayúsculas, tildes, plurales simples y la palabra «Patrulla»: Orca, orcas y «Patrulla Órcas» son la misma.
+
+## Actualización: Guías y fichas médicas (migración 8)
+
+Esta versión mantiene el chat de adultos (`adult_messages`) separado e intacto, y agrega:
+
+- Designación de Guías administrada exclusivamente por adultos desde `/panel/guias`.
+- Chat grupal independiente para adultos y jóvenes designados como Guías (`guide_messages`).
+- Fichas médicas PDF privadas en Supabase Storage (`medical-records`) y metadatos en `medical_documents`.
+- Paleta verde bosque/amarillo para la experiencia de Tropa. La clase CSS `.association-theme` reserva el morado para futuras pantallas generales de la Asociación.
+
+### Despliegue
+
+1. Haz una copia de seguridad desde Supabase antes de cualquier cambio.
+2. En Supabase → SQL Editor, ejecuta **una sola vez** `supabase/migracion_8_guias_y_documentos.sql`.
+3. No vuelvas a ejecutar el esquema completo `schema.sql` sobre una base ya existente; usa únicamente la migración incremental.
+4. Sube el contenido del ZIP al repositorio conectado a Vercel. Conserva las variables `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` ya configuradas.
+5. Verifica el despliegue con cuentas de prueba: scout normal, Guía designado y adulto.
+
+La migración no borra tablas ni registros existentes. El chat actual de adultos conserva su tabla, datos y políticas. Los PDF se limitan a 10 MB y MIME `application/pdf`, con bucket privado y enlaces firmados de cinco minutos.
+
+**Importante:** los adultos que ya tengan el rol `adult` quedan autorizados para consultar las fichas médicas, tal como se acordó para esta primera versión. Si la Tropa necesita restringirlo a un subconjunto específico de adultos, habrá que añadir una designación separada de personal autorizado antes de usar documentos reales.
